@@ -593,9 +593,7 @@ watch([() => form.pages, () => form.pagesToView, () => form.pagesOut, () => form
     plateRow.quantity = form.noOfInsidePlates + coverPlates;
   }
 
-  // Auto-calculate Printing Inside quantity: (Pages / PagesPerSheet) * (Quantity / RunUnit)
-  // Run Unit is a constant of 500
-  const RUN_UNIT = 500;
+  
   const printingInsideRow = form.tableRows.find(
     r => r.category === 'Printing' && r.description.toLowerCase().includes('printing inside')
   );

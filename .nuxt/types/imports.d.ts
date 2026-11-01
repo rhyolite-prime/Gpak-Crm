@@ -87,6 +87,7 @@ declare global {
   const effect: typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['effect']
   const effectScope: typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['effectScope']
   const filterQueryParams: typeof import('../../utils/helpers')['filterQueryParams']
+  const finishingSlug: typeof import('../../utils/finishingOptions')['finishingSlug']
   const formatAscurrency: typeof import('../../utils/helpers')['formatAscurrency']
   const generateEmptyGuid: typeof import('../../utils/helpers')['generateEmptyGuid']
   const generateReceiptNumber: typeof import('../../utils/helpers')['generateReceiptNumber']
@@ -187,6 +188,7 @@ declare global {
   const onServerPrefetch: typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['onServerPrefetch']
   const onUnmounted: typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['onUnmounted']
   const onUpdated: typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['onUpdated']
+  const parseSurfaceFinish: typeof import('../../utils/finishingOptions')['parseSurfaceFinish']
   const prefetchComponents: typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/composables/preload')['prefetchComponents']
   const preloadComponents: typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/composables/preload')['preloadComponents']
   const preloadPayload: typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/composables/payload')['preloadPayload']
@@ -209,6 +211,7 @@ declare global {
   const resolveComponent: typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['resolveComponent']
   const scrollTop: typeof import('../../utils/helpers')['scrollTop']
   const sendQuotationToCustomer: typeof import('../../services/quotations')['sendQuotationToCustomer']
+  const serializeFinishingOptions: typeof import('../../utils/finishingOptions')['serializeFinishingOptions']
   const setInterval: typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/compat/interval')['setInterval']
   const setNewAccountPassword: typeof import('../../services/userAccount')['setNewAccountPassword']
   const setPageLayout: typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/composables/router')['setPageLayout']
@@ -446,6 +449,7 @@ declare module 'vue' {
     readonly effect: UnwrapRef<typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['effect']>
     readonly effectScope: UnwrapRef<typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['effectScope']>
     readonly filterQueryParams: UnwrapRef<typeof import('../../utils/helpers')['filterQueryParams']>
+    readonly finishingSlug: UnwrapRef<typeof import('../../utils/finishingOptions')['finishingSlug']>
     readonly formatAscurrency: UnwrapRef<typeof import('../../utils/helpers')['formatAscurrency']>
     readonly generateEmptyGuid: UnwrapRef<typeof import('../../utils/helpers')['generateEmptyGuid']>
     readonly generateReceiptNumber: UnwrapRef<typeof import('../../utils/helpers')['generateReceiptNumber']>
@@ -546,6 +550,7 @@ declare module 'vue' {
     readonly onServerPrefetch: UnwrapRef<typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['onServerPrefetch']>
     readonly onUnmounted: UnwrapRef<typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['onUnmounted']>
     readonly onUpdated: UnwrapRef<typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['onUpdated']>
+    readonly parseSurfaceFinish: UnwrapRef<typeof import('../../utils/finishingOptions')['parseSurfaceFinish']>
     readonly prefetchComponents: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/composables/preload')['prefetchComponents']>
     readonly preloadComponents: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/composables/preload')['preloadComponents']>
     readonly preloadPayload: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/composables/payload')['preloadPayload']>
@@ -568,6 +573,7 @@ declare module 'vue' {
     readonly resolveComponent: UnwrapRef<typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['resolveComponent']>
     readonly scrollTop: UnwrapRef<typeof import('../../utils/helpers')['scrollTop']>
     readonly sendQuotationToCustomer: UnwrapRef<typeof import('../../services/quotations')['sendQuotationToCustomer']>
+    readonly serializeFinishingOptions: UnwrapRef<typeof import('../../utils/finishingOptions')['serializeFinishingOptions']>
     readonly setInterval: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/compat/interval')['setInterval']>
     readonly setNewAccountPassword: UnwrapRef<typeof import('../../services/userAccount')['setNewAccountPassword']>
     readonly setPageLayout: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/composables/router')['setPageLayout']>
