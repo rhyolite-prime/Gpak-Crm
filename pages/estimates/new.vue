@@ -601,7 +601,6 @@ watch([() => form.pages, () => form.pagesToView, () => form.pagesOut, () => form
     const qty = form.quantity <= 1000 ? 1000 : form.quantity;
     printingInsideRow.quantity = (form.noOfInsidePlates * qty) / 1000; 
   }
-
   // Auto-calculate Printing Cover quantity: (Quantity / NoOfCoversPerSheet) / RunUnitCover
   // Run Unit for cover is a constant of 100
   
