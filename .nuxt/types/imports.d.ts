@@ -115,6 +115,7 @@ declare global {
   const getFinishedGoods: typeof import('../../services/finishedGoods')['getFinishedGoods']
   const getFinishingOptions: typeof import('../../services/finishingOptions')['getFinishingOptions']
   const getFinishingPrices: typeof import('../../services/finishingPrices')['getFinishingPrices']
+  const getFoldingTiers: typeof import('../../utils/finishingPricing')['getFoldingTiers']
   const getFormulas: typeof import('../../services/formulas')['getFormulas']
   const getGrantedPermissionsByRoleId: typeof import('../../services/userManagement')['getGrantedPermissionsByRoleId']
   const getInvoiceDetails: typeof import('../../services/invoices')['getInvoiceDetails']
@@ -235,6 +236,7 @@ declare global {
   const standardDateFormat: typeof import('../../utils/filters')['standardDateFormat']
   const storeToRefs: typeof import('../../node_modules/.pnpm/@pinia+nuxt@0.11.2_magicast@0.3.5_pinia@3.0.3_typescript@5.8.3_vue@3.5.17_typescript@5.8.3__/node_modules/@pinia/nuxt/dist/runtime/composables')['storeToRefs']
   const toAbs: typeof import('../../utils/filters')['toAbs']
+  const toFinishingPricesPayload: typeof import('../../utils/finishingPricing')['toFinishingPricesPayload']
   const toNumber: typeof import('../../utils/filters')['toNumber']
   const toRaw: typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['toRaw']
   const toRef: typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['toRef']
@@ -249,7 +251,6 @@ declare global {
   const updateEstimateType: typeof import('../../services/estimateTypes')['updateEstimateType']
   const updateFinishedGood: typeof import('../../services/finishedGoods')['updateFinishedGood']
   const updateFinishingOption: typeof import('../../services/finishingOptions')['updateFinishingOption']
-  const updateFinishingPrice: typeof import('../../services/finishingPrices')['updateFinishingPrice']
   const updateFormula: typeof import('../../services/formulas')['updateFormula']
   const updatePaymentStatus: typeof import('../../services/payments')['updatePaymentStatus']
   const updateProduct: typeof import('../../services/products')['updateProduct']
@@ -351,6 +352,7 @@ declare global {
   const useTemplateRef: typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['useTemplateRef']
   const useTransitionState: typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['useTransitionState']
   const useUserStore: typeof import('../../stores/useUserStore')['useUserStore']
+  const validateFoldingTiers: typeof import('../../utils/finishingPricing')['validateFoldingTiers']
   const watch: typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['watch']
   const watchEffect: typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['watchEffect']
   const watchPostEffect: typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['watchPostEffect']
@@ -368,14 +370,11 @@ declare global {
   export type { Component, ComponentPublicInstance, ComputedRef, DirectiveBinding, ExtractDefaultPropTypes, ExtractPropTypes, ExtractPublicPropTypes, InjectionKey, PropType, Ref, MaybeRef, MaybeRefOrGetter, VNode, WritableComputedRef } from '../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue'
   import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')
   // @ts-ignore
-  export type { FinishingPrices, FinishingPriceRecord, FinishingPricesSaveRequest } from '../../utils/finishingPricing'
+  export type { FoldingTier, FinishingPrices, FinishingPriceRecord, FinishingPricesSaveRequest } from '../../utils/finishingPricing'
   import('../../utils/finishingPricing')
   // @ts-ignore
   export type { NewsPaper } from '../../services/customers'
   import('../../services/customers')
-  // @ts-ignore
-  export type { FinishingPrice, CreateFinishingPriceRequest, UpdateFinishingPriceRequest, FinishingPriceQuery } from '../../services/finishingPrices'
-  import('../../services/finishingPrices')
 }
 // for vue template auto import
 import { UnwrapRef } from 'vue'
@@ -495,6 +494,7 @@ declare module 'vue' {
     readonly getFinishedGoods: UnwrapRef<typeof import('../../services/finishedGoods')['getFinishedGoods']>
     readonly getFinishingOptions: UnwrapRef<typeof import('../../services/finishingOptions')['getFinishingOptions']>
     readonly getFinishingPrices: UnwrapRef<typeof import('../../services/finishingPrices')['getFinishingPrices']>
+    readonly getFoldingTiers: UnwrapRef<typeof import('../../utils/finishingPricing')['getFoldingTiers']>
     readonly getFormulas: UnwrapRef<typeof import('../../services/formulas')['getFormulas']>
     readonly getGrantedPermissionsByRoleId: UnwrapRef<typeof import('../../services/userManagement')['getGrantedPermissionsByRoleId']>
     readonly getInvoiceDetails: UnwrapRef<typeof import('../../services/invoices')['getInvoiceDetails']>
@@ -615,6 +615,7 @@ declare module 'vue' {
     readonly standardDateFormat: UnwrapRef<typeof import('../../utils/filters')['standardDateFormat']>
     readonly storeToRefs: UnwrapRef<typeof import('../../node_modules/.pnpm/@pinia+nuxt@0.11.2_magicast@0.3.5_pinia@3.0.3_typescript@5.8.3_vue@3.5.17_typescript@5.8.3__/node_modules/@pinia/nuxt/dist/runtime/composables')['storeToRefs']>
     readonly toAbs: UnwrapRef<typeof import('../../utils/filters')['toAbs']>
+    readonly toFinishingPricesPayload: UnwrapRef<typeof import('../../utils/finishingPricing')['toFinishingPricesPayload']>
     readonly toNumber: UnwrapRef<typeof import('../../utils/filters')['toNumber']>
     readonly toRaw: UnwrapRef<typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['toRaw']>
     readonly toRef: UnwrapRef<typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['toRef']>
@@ -629,7 +630,6 @@ declare module 'vue' {
     readonly updateEstimateType: UnwrapRef<typeof import('../../services/estimateTypes')['updateEstimateType']>
     readonly updateFinishedGood: UnwrapRef<typeof import('../../services/finishedGoods')['updateFinishedGood']>
     readonly updateFinishingOption: UnwrapRef<typeof import('../../services/finishingOptions')['updateFinishingOption']>
-    readonly updateFinishingPrice: UnwrapRef<typeof import('../../services/finishingPrices')['updateFinishingPrice']>
     readonly updateFormula: UnwrapRef<typeof import('../../services/formulas')['updateFormula']>
     readonly updatePaymentStatus: UnwrapRef<typeof import('../../services/payments')['updatePaymentStatus']>
     readonly updateProduct: UnwrapRef<typeof import('../../services/products')['updateProduct']>
@@ -731,6 +731,7 @@ declare module 'vue' {
     readonly useTemplateRef: UnwrapRef<typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['useTemplateRef']>
     readonly useTransitionState: UnwrapRef<typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['useTransitionState']>
     readonly useUserStore: UnwrapRef<typeof import('../../stores/useUserStore')['useUserStore']>
+    readonly validateFoldingTiers: UnwrapRef<typeof import('../../utils/finishingPricing')['validateFoldingTiers']>
     readonly watch: UnwrapRef<typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['watch']>
     readonly watchEffect: UnwrapRef<typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['watchEffect']>
     readonly watchPostEffect: UnwrapRef<typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['watchPostEffect']>

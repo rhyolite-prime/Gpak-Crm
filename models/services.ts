@@ -51,6 +51,18 @@ export interface WorkflowTransition {
 }
 
 
+export interface FinishingPrice extends BaseEntityModel { 
+
+    collate: number; 
+    perfectBind: number; 
+    saddleStitch: number; 
+    caseBind: number; 
+    foldingTiers: any[];
+    lamination: any;
+    spot: any;
+
+}
+
 export interface ProductionOrder extends BaseEntityModel {
 
   quotationId: string;  
