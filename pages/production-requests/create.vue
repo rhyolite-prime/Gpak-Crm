@@ -276,6 +276,7 @@
 
 <script setup lang="ts">
 import FinishingOptions from '~/components/ui/FinishingOptions.vue';
+import { serializeFinishingOptions } from '~/utils/finishingOptions';
 
 import { useRoute, useRouter, useNuxtApp } from '#app';
 import { useVuelidate } from '@vuelidate/core';
@@ -318,9 +319,9 @@ const laminateOptions = [
 ];
 
 const vanishOptions = [
-  { id: 'uv-vanish', name: 'UV Vanish' },
-  { id: 'waterbase-vanish', name: 'Waterbase Vanish' },
-  { id: 'oil-vanish', name: 'Oil Vanish' },
+  { id: 'uv-varnish', name: 'UV Vanish' },
+  { id: 'waterbase-varnish', name: 'Waterbase Vanish' },
+  { id: 'oil-varnish', name: 'Oil Vanish' },
 ];
 
 const spotOptions = [
@@ -478,12 +479,6 @@ const removeJob = (index: number) => {
   if (form.jobRequests.length > 1) form.jobRequests.splice(index, 1);
 };
 
-// ── Resolve custom values before submit ───────────────────────────────────────
-const resolveCustom = (value: string, custom: string) =>
-  value === 'custom' ? custom : value;
-
-const resolveAddons = (addons: string[], custom: string) =>
-  addons.map(a => (a === 'custom' ? custom : a)).filter(Boolean);
 
 // ── Submit: one production request per job card ───────────────────────────────
 const submitRequest = async () => {
@@ -522,12 +517,7 @@ const submitRequest = async () => {
         paperInsideRawMaterialId: job.paperInsideRawMaterialId,
         noOfColoursText: job.noOfColoursText || 0,
         noOfColoursCover: job.noOfColoursCover || 0,
-        binding: resolveCustom(job.binding, job.bindingCustom),
-        addons: resolveAddons(job.addons, job.addonsCustom),
-        laminate: resolveCustom(job.laminate, job.laminateCustom),
-        vanish: resolveCustom(job.vanish, job.vanishCustom),
-        spot: resolveCustom(job.spot, job.spotCustom),
-        windowPatching: resolveCustom(job.windowPatching, job.windowPatchingCustom),
+        finishingOptions: serializeFinishingOptions(job),
         adminRemarks: job.otherInstructions,
       };
 

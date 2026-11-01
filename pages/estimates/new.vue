@@ -173,7 +173,9 @@
                           <input v-model="row.description" type="text" class="flex-1 border-transparent bg-transparent rounded p-1 focus:border-blue-400 focus:ring-blue-400 text-sm font-medium" placeholder="Label (e.g. 10% added)" />
                         </div>
                       </td>
-                      <td class="px-4 py-2 text-center text-gray-400 text-xs">—</td>
+                      <td class="px-4 py-2">
+                        <input v-model.number="row.quantity" @input="row.quantityManuallyEdited = true" type="number" min="0" step="any" aria-label="Percentage quantity" class="w-full border border-gray-300 rounded p-1 text-right text-sm focus:ring-blue-400 focus:border-blue-400" />
+                      </td>
                       <td class="px-4 py-2">
                         <div class="flex items-center justify-end gap-1">
                           <input v-model.number="row.percentageRate" @input="recalcPercentageRow(row)" type="number" step="0.1" class="w-14 border border-blue-200 bg-white rounded p-1 text-right text-xs focus:ring-blue-400 focus:border-blue-400" />
@@ -200,6 +202,7 @@
                               {{ target.description || '(untitled)' }}
                             </option>
                           </select>
+                          <button v-if="row.quantityManuallyEdited" type="button" class="font-medium text-blue-700 hover:text-blue-900" @click="row.quantityManuallyEdited = false; recalcPercentageRow(row)">Use calculated quantity</button>
                         </div>
                       </td>
                     </tr>
@@ -397,6 +400,7 @@ interface TableRow {
   percentageRate?: number;
   percentageTarget?: string;
   computedTotal?: number;
+  quantityManuallyEdited?: boolean;
 }
 
 interface SummaryField {
@@ -721,9 +725,12 @@ const getPaperTargetRows = (pluginRowId: string) => {
 const recalcPercentageRow = (row: TableRow) => {
   row.description = `${row.percentageRate || 0}% added`;
   const target = form.tableRows.find(r => r.id === row.percentageTarget);
-  if (!target) { row.computedTotal = 0; return; }
-  const targetTotal = (target.quantity || 0) * (target.unitPrice || 0);
-  row.computedTotal = targetTotal * ((row.percentageRate || 0) / 100);
+  const calculatedQuantity = target ? (target.quantity || 0) * ((row.percentageRate || 0) / 100) : 0;
+  if (!row.quantityManuallyEdited && row.quantity !== calculatedQuantity) row.quantity = calculatedQuantity;
+  const unitPrice = target?.unitPrice || 0;
+  if (row.unitPrice !== unitPrice) row.unitPrice = unitPrice;
+  const total = (row.quantity || 0) * unitPrice;
+  if (row.computedTotal !== total) row.computedTotal = total;
 };
 
 const recalcAllPercentageRows = () => {
@@ -970,6 +977,7 @@ const saveEstimate = async () => {
       _variantName:       r.variantName ?? '',
       _optionName:        r.optionName ?? '',
       _computedTotal:     r.computedTotal ?? 0,
+      quantityManuallyEdited: r.quantityManuallyEdited ?? false,
       _id:                r.id,
     }));
 
@@ -1098,6 +1106,7 @@ const loadEstimateForEdit = async (id: string) => {
         match.quantity  = d.quantity ?? null;
         match.unitPrice = d.unitPrice ?? null;
         if (match.isPercentagePlugin) {
+          match.quantityManuallyEdited = d.quantityManuallyEdited ?? false;
           match.percentageRate   = d.percentageRate ?? 10;
           match.percentageTarget = d.percentageTarget ?? '';
           match.computedTotal    = d._computedTotal ?? 0;
