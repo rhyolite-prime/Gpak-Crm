@@ -33,3 +33,25 @@ test('save request includes complete, distinct price records and preserves blank
   config.collate = -1
   assert.throws(() => buildFinishingPricesRequest(config), /non-negative/)
 })
+
+test('editable folding bands return the flat price for the matching piece count', async () => {
+  const { buildFinishingPricesRequest, getFoldingTiers } = await import('../utils/finishingPricing.ts')
+  const config = defaultFinishingPrices()
+  config.foldingTiers = [
+    { minQuantity: 10, maxQuantity: 200, price: 7 },
+    { minQuantity: 300, maxQuantity: null, price: 25 },
+  ]
+  assert.equal(foldingPrice(200, config), 7)
+  assert.equal(foldingPrice(201, config), null)
+  assert.equal(foldingPrice(300, config), 25)
+  assert.equal(foldingPrice(10000, config), 25)
+  assert.deepEqual(buildFinishingPricesRequest(config).prices.filter(p => p.category === 'folding').map(p => [p.minQuantity, p.maxQuantity, p.unitPrice]), [[10, 200, 7], [300, null, 25]])
+  assert.deepEqual(getFoldingTiers({ foldingUpTo1000: 18, foldingAbove1000: 12 }).map(t => t.price), [18, 12])
+  config.foldingTiers[1].minQuantity = 200
+  assert.throws(() => buildFinishingPricesRequest(config), /overlap/)
+  config.foldingTiers[1].minQuantity = 300
+  config.foldingTiers[0].maxQuantity = null
+  assert.throws(() => buildFinishingPricesRequest(config), /overlap/)
+  config.foldingTiers[0].maxQuantity = 2
+  assert.throws(() => buildFinishingPricesRequest(config), /maximum/)
+})
