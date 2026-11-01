@@ -1,9 +1,9 @@
 import type { BaseApiResponse, BasePaginationModel } from '~/models'
-import type { FinishingPriceRecord } from '~/utils/finishingPricing'
+import type { FinishingPriceRecord, FinishingPrices } from '~/utils/finishingPricing'
 
 /** Proposed API contract. Confirm routes and response shapes with the backend before use. */
 export type FinishingPrice = FinishingPriceRecord & { id: string; currency: 'GHS' }
-export type CreateFinishingPriceRequest = FinishingPriceRecord & { currency: 'GHS' }
+export type CreateFinishingPriceRequest = FinishingPrices
 export type UpdateFinishingPriceRequest = CreateFinishingPriceRequest & { id: string }
 export type FinishingPriceQuery = {
   pageNo: number

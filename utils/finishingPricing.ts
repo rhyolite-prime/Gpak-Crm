@@ -22,7 +22,7 @@ export function loadFinishingPrices(): FinishingPrices {
   try {
     const saved = JSON.parse(localStorage.getItem(PRICING_KEY) || 'null')
     if (!saved || typeof saved !== 'object') return defaults
-    return { ...defaults, ...saved, foldingTiers: getFoldingTiers(saved), lamination: Object.fromEntries(LAMINATION_TYPES.map(t => [t, { ...defaults.lamination[t], ...saved.lamination?.[t] }])), spot: { ...defaults.spot, ...saved.spot } }
+    return toFinishingPricesPayload(saved)
   } catch { return defaults }
 }
 export function bookworkQuantities(pagesInSection: number, jobQuantity: number, pages: number, coverQuantity: number, coverOvers: number, outs: number, size: number, spotOvers: number) {
@@ -37,6 +37,20 @@ export function getFoldingTiers(prices: Partial<FinishingPrices> & { foldingUpTo
     { minQuantity: 1001, maxQuantity: null, price: prices.foldingAbove1000 ?? null },
   ]
   return defaultFinishingPrices().foldingTiers
+}
+
+/** Build the current setup shape without carrying legacy properties into API requests. */
+export function toFinishingPricesPayload(prices: Partial<FinishingPrices> & { foldingUpTo1000?: number | null; foldingAbove1000?: number | null }): FinishingPrices {
+  const defaults = defaultFinishingPrices()
+  return {
+    collate: prices.collate === undefined ? defaults.collate : prices.collate,
+    foldingTiers: getFoldingTiers(prices).map(tier => ({ minQuantity: tier.minQuantity, maxQuantity: (tier.maxQuantity as unknown) === '' ? null : tier.maxQuantity, price: tier.price })),
+    perfectBind: prices.perfectBind === undefined ? defaults.perfectBind : prices.perfectBind,
+    saddleStitch: prices.saddleStitch === undefined ? defaults.saddleStitch : prices.saddleStitch,
+    caseBind: prices.caseBind === undefined ? defaults.caseBind : prices.caseBind,
+    lamination: Object.fromEntries(LAMINATION_TYPES.map(type => [type, { ...defaults.lamination[type], ...prices.lamination?.[type] }])),
+    spot: { ...defaults.spot, ...prices.spot },
+  }
 }
 
 /** Price is a flat charge for the one band containing the total number of pieces. */

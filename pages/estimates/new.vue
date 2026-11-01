@@ -371,7 +371,7 @@
 
 <script setup lang="ts">
 import { useRoute, useRouter, useNuxtApp } from '#app';
-import { defaultFinishingPrices, loadFinishingPrices, bookworkQuantities, foldingPrice, LAMINATION_TYPES, LAMINATION_SIZES, SPOT_TYPES } from '~/utils/finishingPricing';
+import { defaultFinishingPrices, loadFinishingPrices, bookworkQuantities, foldingPrice, toFinishingPricesPayload, LAMINATION_TYPES, LAMINATION_SIZES, SPOT_TYPES } from '~/utils/finishingPricing';
 import { getProductionRequestDetails } from '~/services/productionRequests';
 import { getRawMaterials } from '~/services/rawMaterials';
 import { createProductionEstimate, updateProductionEstimate, getEstimateDetails } from '~/services/estimates';
@@ -980,7 +980,7 @@ const saveEstimate = async () => {
       // Summary fields (JSON-encoded so the edit page can restore them)
       makeVar('Summaries',              'summaries',             JSON.stringify(form.summaries)),
       makeVar('Finishing selection', 'finishingSelection', JSON.stringify(finishingSelection)),
-      makeVar('Finishing prices', 'finishingPrices', JSON.stringify(finishingPrices.value)),
+      makeVar('Finishing prices', 'finishingPrices', JSON.stringify(toFinishingPricesPayload(finishingPrices.value))),
       makeVar('Estimate rows', 'estimateRows', JSON.stringify(form.tableRows)),
     ];
 

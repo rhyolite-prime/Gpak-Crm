@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { LAMINATION_TYPES, LAMINATION_SIZES, SPOT_TYPES, PRICING_KEY, loadFinishingPrices, defaultFinishingPrices, buildFinishingPricesRequest } from '~/utils/finishingPricing'
+import { LAMINATION_TYPES, LAMINATION_SIZES, SPOT_TYPES, PRICING_KEY, loadFinishingPrices, defaultFinishingPrices, buildFinishingPricesRequest, toFinishingPricesPayload } from '~/utils/finishingPricing'
 definePageMeta({ layout: 'default', middleware: 'auth' })
 useHead({ title: 'Finishing price setup' })
 const prices = ref(defaultFinishingPrices())
@@ -17,8 +17,7 @@ const save = () => {
     buildFinishingPricesRequest(prices.value);
     prices.value.foldingTiers.forEach(tier => { if ((tier.maxQuantity as unknown) === '') tier.maxQuantity = null })
 
-    console.log(prices.value);
-    createFinishingPrice(prices.value);
+    createFinishingPrice(toFinishingPricesPayload(prices.value));
      
     saved.value = true
   } catch (error) { alert(error instanceof Error ? error.message : 'Unable to save prices in this browser.') }

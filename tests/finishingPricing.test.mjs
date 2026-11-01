@@ -55,3 +55,15 @@ test('editable folding bands return the flat price for the matching piece count'
   config.foldingTiers[0].maxQuantity = 2
   assert.throws(() => buildFinishingPricesRequest(config), /maximum/)
 })
+
+test('current setup payload excludes legacy folding properties, including migrated values', async () => {
+  const { toFinishingPricesPayload } = await import('../utils/finishingPricing.ts')
+  const oldSetup = { ...defaultFinishingPrices(), foldingUpTo1000: 99, foldingAbove1000: 88 }
+  delete oldSetup.foldingTiers
+  const result = toFinishingPricesPayload(oldSetup)
+  assert.equal('foldingUpTo1000' in result, false)
+  assert.equal('foldingAbove1000' in result, false)
+  assert.deepEqual(result.foldingTiers.map(tier => tier.price), [99, 88])
+  assert.equal('foldingUpTo1000' in toFinishingPricesPayload({ ...oldSetup, foldingTiers: [] }), false)
+  assert.deepEqual(toFinishingPricesPayload({ ...oldSetup, foldingTiers: [] }).foldingTiers, [])
+})
