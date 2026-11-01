@@ -66,5 +66,5 @@ export { createWorkflowTransition, updateWorkflowTransition, deleteWorkflowTrans
 export { useAuthStore } from '../stores/auth';
 export { useUserStore } from '../stores/useUserStore';
 export { defineStore, acceptHMRUpdate, usePinia, storeToRefs } from '../node_modules/.pnpm/@pinia+nuxt@0.11.2_magicast@0.3.5_pinia@3.0.3_typescript@5.8.3_vue@3.5.17_typescript@5.8.3__/node_modules/@pinia/nuxt/dist/runtime/composables';
-export { useNuxtDevTools } from '../node_modules/.pnpm/@nuxt+devtools@2.6.2_vite@6.3.5_@types+node@24.0.15_jiti@2.4.2_terser@5.43.1_yaml@2.8.0__vue@3.5.17_typescript@5.8.3_/node_modules/@nuxt/devtools/dist/runtime/use-nuxt-devtools';
-export { definePageMeta } from '../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_baa376921554d6ec481e87f4de4caaf2/node_modules/nuxt/dist/pages/runtime/composables';
+export { useNuxtDevTools } from '../node_modules/.pnpm/@nuxt+devtools@4.0.0_@devframes+agentic@1.3.0_@devframes+hub-ui@1.3.0_@devframes+hub@1._cd25819c5822eac6f7f4d51595f924ff/node_modules/@nuxt/devtools/dist/runtime/use-nuxt-devtools';
+export { definePageMeta } from '../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/pages/runtime/composables';
