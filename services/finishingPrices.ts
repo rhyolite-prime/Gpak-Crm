@@ -8,8 +8,7 @@ export async function getFinishingPrices(query: object) {
 }
 
 export async function createFinishingPrice(payload: object) {
-  const response = await httpClient<BaseApiResponse<object>>(
-    'FinishingOptionPrice/create', { method: 'post', body: payload },
-  )
+
+  const response = await httpClient<BaseApiResponse<object>>('FinishingOptionPrice/create', { method: 'post', body: payload })
   return response.success;
 }
