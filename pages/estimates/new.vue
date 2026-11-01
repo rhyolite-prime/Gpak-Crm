@@ -598,17 +598,19 @@ watch([() => form.pages, () => form.pagesToView, () => form.pagesOut, () => form
     r => r.category === 'Printing' && r.description.toLowerCase().includes('printing inside')
   );
 
+  //quantity for printing inside
   if (printingInsideRow) {
     const pages = form.pages || 0;
     const pagesPerSheet = form.noOfInsidePlates || 1;
     const qty = form.quantity <= 1000 ? 1000 : form.quantity;
-    printingInsideRow.quantity = (form.noOfInsidePlates * qty) / 1000; 
+    printingInsideRow.quantity = (form.noOfInsidePlates * qty) / 1000;
   }
-  
+
+  //quantity for printing cover
   const printingCoverRow = form.tableRows.find(
     r => r.category === 'Printing' && r.description.toLowerCase().includes('printing cover')
   );
-  
+
   if (printingCoverRow) {
     const qty = form.quantity || 0;
     printingCoverRow.quantity = Math.ceil((qty / 2)/1000) * form.noOfColoursCover * form.noOfCoverSides;
