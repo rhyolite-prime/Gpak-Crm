@@ -201,228 +201,7 @@
               </div>
             </div>
 
-            <!-- ── FINISHING OPTIONS ── -->
-            <div class="border-t border-gray-200 pt-5 mt-6">
-              <h5 class="text-sm font-bold tracking-wide uppercase text-gray-900 mb-4">Finishing Options</h5>
-
-              <!-- Binding (radio – single select) -->
-              <div class="mb-5">
-                <h6 class="text-xs font-bold text-gray-700 uppercase tracking-wide mb-2 pb-1 border-b border-red-100">Binding</h6>
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                  <div v-for="opt in bindingOptions" :key="opt.id" class="flex items-center">
-                    <label class="flex items-center cursor-pointer select-none gap-2">
-                      <input type="radio" name="edit-binding" :value="opt.id" v-model="form.binding" class="text-red-600 focus:ring-red-500 h-4 w-4 border-gray-300" />
-                      <span class="text-sm text-gray-700">{{ opt.name }}</span>
-                    </label>
-                  </div>
-                  <div class="col-span-full flex items-center gap-3 flex-wrap">
-                    <label class="flex items-center cursor-pointer select-none gap-2">
-                      <input type="radio" name="edit-binding" value="custom" v-model="form.binding" class="text-red-600 focus:ring-red-500 h-4 w-4 border-gray-300" />
-                      <span class="text-sm text-gray-700">Custom</span>
-                    </label>
-                    <input
-                      v-if="form.binding === 'custom'"
-                      type="text"
-                      v-model="form.bindingCustom"
-                      placeholder="Enter custom binding…"
-                      class="flex-1 min-w-[180px] max-w-xs border border-gray-300 rounded p-1.5 text-sm focus:ring-red-500 focus:border-red-500 bg-white"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <!-- Adds / Add-ons (checkboxes – multi select) -->
-              <div class="mb-5">
-                <h6 class="text-xs font-bold text-gray-700 uppercase tracking-wide mb-2 pb-1 border-b border-red-100">Adds / Add-ons</h6>
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                  <div v-for="opt in addOptions" :key="opt.id" class="flex items-center">
-                    <label class="flex items-center cursor-pointer select-none gap-2">
-                      <input type="checkbox" :value="opt.id" v-model="form.addons" class="text-red-600 focus:ring-red-500 h-4 w-4 border-gray-300 rounded" />
-                      <span class="text-sm text-gray-700">{{ opt.name }}</span>
-                    </label>
-                  </div>
-                  <div class="col-span-full flex items-center gap-3 flex-wrap">
-                    <label class="flex items-center cursor-pointer select-none gap-2">
-                      <input type="checkbox" value="custom" v-model="form.addons" class="text-red-600 focus:ring-red-500 h-4 w-4 border-gray-300 rounded" />
-                      <span class="text-sm text-gray-700">Custom</span>
-                    </label>
-                    <input
-                      v-if="form.addons.includes('custom')"
-                      type="text"
-                      v-model="form.addonsCustom"
-                      placeholder="Enter custom add-on…"
-                      class="flex-1 min-w-[180px] max-w-xs border border-gray-300 rounded p-1.5 text-sm focus:ring-red-500 focus:border-red-500 bg-white"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <h5 class="text-sm font-bold tracking-wide uppercase text-gray-900 mb-3 mt-6">Finishing</h5>
-              <div class="bg-yellow-50 border border-yellow-200 rounded p-3 text-yellow-800 text-sm mb-4">
-                ⚠️ Please note: You can only select one option from Laminate, Vanish, Spot, or Window Patching.
-              </div>
-
-              <!-- Laminate (radio) -->
-              <div class="mb-5">
-                <h6 class="text-xs font-bold text-gray-700 uppercase tracking-wide mb-2 pb-1 border-b border-red-100">Laminate</h6>
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                  <div v-for="opt in laminateOptions" :key="opt.id" class="flex items-center">
-                    <label class="flex items-center cursor-pointer select-none gap-2">
-                      <input
-                        type="radio"
-                        name="edit-laminate"
-                        :value="opt.id"
-                        v-model="form.laminate"
-                        @change="clearOtherFinishingOptions('laminate')"
-                        class="text-red-600 focus:ring-red-500 h-4 w-4 border-gray-300"
-                      />
-                      <span class="text-sm text-gray-700">{{ opt.name }}</span>
-                    </label>
-                  </div>
-                  <div class="col-span-full flex items-center gap-3 flex-wrap">
-                    <label class="flex items-center cursor-pointer select-none gap-2">
-                      <input
-                        type="radio"
-                        name="edit-laminate"
-                        value="custom"
-                        v-model="form.laminate"
-                        @change="clearOtherFinishingOptions('laminate')"
-                        class="text-red-600 focus:ring-red-500 h-4 w-4 border-gray-300"
-                      />
-                      <span class="text-sm text-gray-700">Custom</span>
-                    </label>
-                    <input
-                      v-if="form.laminate === 'custom'"
-                      type="text"
-                      v-model="form.laminateCustom"
-                      placeholder="Enter custom laminate…"
-                      class="flex-1 min-w-[180px] max-w-xs border border-gray-300 rounded p-1.5 text-sm focus:ring-red-500 focus:border-red-500 bg-white"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <!-- Vanish (radio) -->
-              <div class="mb-5">
-                <h6 class="text-xs font-bold text-gray-700 uppercase tracking-wide mb-2 pb-1 border-b border-red-100">Vanish</h6>
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                  <div v-for="opt in vanishOptions" :key="opt.id" class="flex items-center">
-                    <label class="flex items-center cursor-pointer select-none gap-2">
-                      <input
-                        type="radio"
-                        name="edit-vanish"
-                        :value="opt.id"
-                        v-model="form.vanish"
-                        @change="clearOtherFinishingOptions('vanish')"
-                        class="text-red-600 focus:ring-red-500 h-4 w-4 border-gray-300"
-                      />
-                      <span class="text-sm text-gray-700">{{ opt.name }}</span>
-                    </label>
-                  </div>
-                  <div class="col-span-full flex items-center gap-3 flex-wrap">
-                    <label class="flex items-center cursor-pointer select-none gap-2">
-                      <input
-                        type="radio"
-                        name="edit-vanish"
-                        value="custom"
-                        v-model="form.vanish"
-                        @change="clearOtherFinishingOptions('vanish')"
-                        class="text-red-600 focus:ring-red-500 h-4 w-4 border-gray-300"
-                      />
-                      <span class="text-sm text-gray-700">Custom</span>
-                    </label>
-                    <input
-                      v-if="form.vanish === 'custom'"
-                      type="text"
-                      v-model="form.vanishCustom"
-                      placeholder="Enter custom vanish…"
-                      class="flex-1 min-w-[180px] max-w-xs border border-gray-300 rounded p-1.5 text-sm focus:ring-red-500 focus:border-red-500 bg-white"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <!-- Spot (radio) -->
-              <div class="mb-5">
-                <h6 class="text-xs font-bold text-gray-700 uppercase tracking-wide mb-2 pb-1 border-b border-red-100">Spot</h6>
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                  <div v-for="opt in spotOptions" :key="opt.id" class="flex items-center">
-                    <label class="flex items-center cursor-pointer select-none gap-2">
-                      <input
-                        type="radio"
-                        name="edit-spot"
-                        :value="opt.id"
-                        v-model="form.spot"
-                        @change="clearOtherFinishingOptions('spot')"
-                        class="text-red-600 focus:ring-red-500 h-4 w-4 border-gray-300"
-                      />
-                      <span class="text-sm text-gray-700">{{ opt.name }}</span>
-                    </label>
-                  </div>
-                  <div class="col-span-full flex items-center gap-3 flex-wrap">
-                    <label class="flex items-center cursor-pointer select-none gap-2">
-                      <input
-                        type="radio"
-                        name="edit-spot"
-                        value="custom"
-                        v-model="form.spot"
-                        @change="clearOtherFinishingOptions('spot')"
-                        class="text-red-600 focus:ring-red-500 h-4 w-4 border-gray-300"
-                      />
-                      <span class="text-sm text-gray-700">Custom</span>
-                    </label>
-                    <input
-                      v-if="form.spot === 'custom'"
-                      type="text"
-                      v-model="form.spotCustom"
-                      placeholder="Enter custom spot…"
-                      class="flex-1 min-w-[180px] max-w-xs border border-gray-300 rounded p-1.5 text-sm focus:ring-red-500 focus:border-red-500 bg-white"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <!-- Window Patching (radio) -->
-              <div class="mb-5">
-                <h6 class="text-xs font-bold text-gray-700 uppercase tracking-wide mb-2 pb-1 border-b border-red-100">Window Patching</h6>
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                  <div class="flex items-center">
-                    <label class="flex items-center cursor-pointer select-none gap-2">
-                      <input
-                        type="radio"
-                        name="edit-windowPatching"
-                        value="window-patching"
-                        v-model="form.windowPatching"
-                        @change="clearOtherFinishingOptions('windowPatching')"
-                        class="text-red-600 focus:ring-red-500 h-4 w-4 border-gray-300"
-                      />
-                      <span class="text-sm text-gray-700">Window Patching</span>
-                    </label>
-                  </div>
-                  <div class="col-span-full flex items-center gap-3 flex-wrap">
-                    <label class="flex items-center cursor-pointer select-none gap-2">
-                      <input
-                        type="radio"
-                        name="edit-windowPatching"
-                        value="custom"
-                        v-model="form.windowPatching"
-                        @change="clearOtherFinishingOptions('windowPatching')"
-                        class="text-red-600 focus:ring-red-500 h-4 w-4 border-gray-300"
-                      />
-                      <span class="text-sm text-gray-700">Custom</span>
-                    </label>
-                    <input
-                      v-if="form.windowPatching === 'custom'"
-                      type="text"
-                      v-model="form.windowPatchingCustom"
-                      placeholder="Enter custom window patching…"
-                      class="flex-1 min-w-[180px] max-w-xs border border-gray-300 rounded p-1.5 text-sm focus:ring-red-500 focus:border-red-500 bg-white"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- END FINISHING OPTIONS -->
+            <FinishingOptions :model="form" :name-prefix="'edit'" :binding-options="bindingOptions" :add-options="addOptions" :laminate-options="laminateOptions" :vanish-options="vanishOptions" :spot-options="spotOptions" @surface-change="clearOtherFinishingOptions($event)" />
 
             <!-- Other Instructions -->
             <div class="flex flex-col gap-1 mt-6">
@@ -453,6 +232,7 @@
 </template>
 
 <script setup lang="ts">
+import FinishingOptions from '~/components/ui/FinishingOptions.vue';
  
 import { useRoute, useRouter, useNuxtApp } from '#app';
 import { useVuelidate } from '@vuelidate/core';
@@ -696,18 +476,33 @@ const loadRequestDetails = async () => {
     form.noOfColoursText = details.noOfColoursText ?? null;
     form.noOfColoursCover = details.noOfColoursCover ?? null;
     // Finishing
-    form.binding = details.binding || '';
-    form.bindingCustom = details.bindingCustom || '';
+    // The API stores custom selections as their text, rather than as "custom".
+    // Restore the matching option so existing values remain visible and editable.
+    const restoreChoice = (value: string, custom: string, options: { id: string }[]) => {
+      if (!value) return { value: '', custom: custom || '' };
+      if (value === 'custom') return { value, custom: custom || '' };
+      return options.some(option => option.id === value)
+        ? { value, custom: '' }
+        : { value: 'custom', custom: value };
+    };
+    const binding = restoreChoice(details.binding, details.bindingCustom, bindingOptions);
+    form.binding = binding.value;
+    form.bindingCustom = binding.custom;
     form.addons = Array.isArray(details.addons) ? [...details.addons] : [];
     form.addonsCustom = details.addonsCustom || '';
-    form.laminate = details.laminate || '';
-    form.laminateCustom = details.laminateCustom || '';
-    form.vanish = details.vanish || '';
-    form.vanishCustom = details.vanishCustom || '';
-    form.spot = details.spot || '';
-    form.spotCustom = details.spotCustom || '';
-    form.windowPatching = details.windowPatching || '';
-    form.windowPatchingCustom = details.windowPatchingCustom || '';
+    const customAddon = form.addons.find(addon => addon !== 'custom' && !addOptions.some(option => option.id === addon));
+    if (customAddon) {
+      form.addons = form.addons.map(addon => addon === customAddon ? 'custom' : addon);
+      form.addonsCustom = customAddon;
+    }
+    const laminate = restoreChoice(details.laminate, details.laminateCustom, laminateOptions);
+    form.laminate = laminate.value; form.laminateCustom = laminate.custom;
+    const vanish = restoreChoice(details.vanish, details.vanishCustom, vanishOptions);
+    form.vanish = vanish.value; form.vanishCustom = vanish.custom;
+    const spot = restoreChoice(details.spot, details.spotCustom, spotOptions);
+    form.spot = spot.value; form.spotCustom = spot.custom;
+    const windowPatching = restoreChoice(details.windowPatching, details.windowPatchingCustom, [{ id: 'window-patching' }]);
+    form.windowPatching = windowPatching.value; form.windowPatchingCustom = windowPatching.custom;
     form.adminRemarks = details.adminRemarks || '';
   } catch (error) {
     console.error('Error loading production request:', error);
