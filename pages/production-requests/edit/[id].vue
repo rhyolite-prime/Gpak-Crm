@@ -233,6 +233,7 @@
 
 <script setup lang="ts">
 import FinishingOptions from '~/components/ui/FinishingOptions.vue';
+import { serializeFinishingOptions, parseSurfaceFinish } from '~/utils/finishingOptions';
  
 import { useRoute, useRouter, useNuxtApp } from '#app';
 import { useVuelidate } from '@vuelidate/core';
@@ -284,9 +285,9 @@ const laminateOptions = [
 ];
 
 const vanishOptions = [
-  { id: 'uv-vanish', name: 'UV Vanish' },
-  { id: 'waterbase-vanish', name: 'Waterbase Vanish' },
-  { id: 'oil-vanish', name: 'Oil Vanish' },
+  { id: 'uv-varnish', name: 'UV Vanish' },
+  { id: 'waterbase-varnish', name: 'Waterbase Vanish' },
+  { id: 'oil-varnish', name: 'Oil Vanish' },
 ];
 
 const spotOptions = [
@@ -425,12 +426,6 @@ const clearOtherFinishingOptions = (selectedCategory: string) => {
   if (selectedCategory !== 'windowPatching' && form.windowPatching) { form.windowPatching = ''; form.windowPatchingCustom = ''; }
 };
 
-// ── Resolve custom value before submit ────────────────────────────────────────
-const resolveCustom = (value: string, custom: string) =>
-  value === 'custom' ? custom : value;
-
-const resolveAddons = (addons: string[], custom: string) =>
-  addons.map(a => (a === 'custom' ? custom : a)).filter(Boolean);
 
 // ── Load existing request ─────────────────────────────────────────────────────
 const loadRequestDetails = async () => {
@@ -485,23 +480,27 @@ const loadRequestDetails = async () => {
         ? { value, custom: '' }
         : { value: 'custom', custom: value };
     };
-    const binding = restoreChoice(details.binding, details.bindingCustom, bindingOptions);
+    const finishing = details.finishingOptions ?? details.FinishingOptions;
+    const surface = finishing ? parseSurfaceFinish(finishing.SurfaceFinish ?? finishing.surfaceFinish ?? '') : null;
+    const surfaceValue = (field: string, legacy: string) => finishing ? (surface?.field === field ? surface.value : '') : legacy;
+    const binding = restoreChoice(finishing ? (finishing.Binding ?? finishing.binding ?? '') : details.binding, details.bindingCustom, bindingOptions);
     form.binding = binding.value;
     form.bindingCustom = binding.custom;
-    form.addons = Array.isArray(details.addons) ? [...details.addons] : [];
+    const addons = finishing ? (finishing.AdditionalOptions ?? finishing.additionalOptions) : details.addons;
+    form.addons = Array.isArray(addons) ? [...addons] : [];
     form.addonsCustom = details.addonsCustom || '';
     const customAddon = form.addons.find(addon => addon !== 'custom' && !addOptions.some(option => option.id === addon));
     if (customAddon) {
       form.addons = form.addons.map(addon => addon === customAddon ? 'custom' : addon);
       form.addonsCustom = customAddon;
     }
-    const laminate = restoreChoice(details.laminate, details.laminateCustom, laminateOptions);
+    const laminate = restoreChoice(surfaceValue('laminate', details.laminate), details.laminateCustom, laminateOptions);
     form.laminate = laminate.value; form.laminateCustom = laminate.custom;
-    const vanish = restoreChoice(details.vanish, details.vanishCustom, vanishOptions);
+    const vanish = restoreChoice(surfaceValue('vanish', details.vanish)?.replace(/-vanish$/, '-varnish'), details.vanishCustom, vanishOptions);
     form.vanish = vanish.value; form.vanishCustom = vanish.custom;
-    const spot = restoreChoice(details.spot, details.spotCustom, spotOptions);
+    const spot = restoreChoice(surfaceValue('spot', details.spot), details.spotCustom, spotOptions);
     form.spot = spot.value; form.spotCustom = spot.custom;
-    const windowPatching = restoreChoice(details.windowPatching, details.windowPatchingCustom, [{ id: 'window-patching' }]);
+    const windowPatching = restoreChoice(surfaceValue('windowPatching', details.windowPatching), details.windowPatchingCustom, [{ id: 'window-patching' }]);
     form.windowPatching = windowPatching.value; form.windowPatchingCustom = windowPatching.custom;
     form.adminRemarks = details.adminRemarks || '';
   } catch (error) {
@@ -548,12 +547,7 @@ const saveRequest = async () => {
     paperInsideRawMaterialId: form.paperInsideRawMaterialId,
     noOfColoursText: form.noOfColoursText || 0,
     noOfColoursCover: form.noOfColoursCover || 0,
-    binding: resolveCustom(form.binding, form.bindingCustom),
-    addons: resolveAddons(form.addons, form.addonsCustom),
-    laminate: resolveCustom(form.laminate, form.laminateCustom),
-    vanish: resolveCustom(form.vanish, form.vanishCustom),
-    spot: resolveCustom(form.spot, form.spotCustom),
-    windowPatching: resolveCustom(form.windowPatching, form.windowPatchingCustom),
+    finishingOptions: serializeFinishingOptions(form),
     adminRemarks: form.adminRemarks || '',
   };
 

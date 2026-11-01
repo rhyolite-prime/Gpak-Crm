@@ -292,7 +292,7 @@
                                             </div>
                                         </td>
                                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 w-24">
-                                            <input v-model.number="item.quantity" disabled type="number" min="0" class="table-input text-right bg-gray-100 text-gray-500 border-transparent" />
+                                            <input v-model.number="item.quantity" @input="item.quantityManuallyEdited = true" type="number" min="0" step="any" class="table-input text-right" aria-label="Percentage quantity" />
                                         </td>
                                         <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 w-32">
                                             <input v-model.number="item.unitPrice" type="number" min="0" step="0.01" class="table-input text-right" />
@@ -327,6 +327,7 @@
                                                       </optgroup>
                                                   </select>
                                               </div>
+                                              <button v-if="item.quantityManuallyEdited" type="button" class="text-xs font-medium text-blue-700 hover:text-blue-900" @click="item.quantityManuallyEdited = false; recalculateAllFormulas()">Use calculated quantity</button>
                                           </div>
                                        </td>
                                     </tr>
@@ -752,7 +753,7 @@ const recalculateAllFormulas = () => {
                  
                  item.formulaOutput = roundedResult; // Keep track of latest calculation
 
-                 if (item.quantity !== roundedResult) {
+                 if (!item.quantityManuallyEdited && item.quantity !== roundedResult) {
                      item.quantity = roundedResult;
                      hasChanged = true;
                  }
