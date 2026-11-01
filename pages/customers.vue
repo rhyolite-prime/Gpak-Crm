@@ -22,7 +22,7 @@
     <!-- Customer Table -->
     <div class="bg-white rounded-lg border border-gray-200 overflow-hidden relative min-h-[400px]">
       <!-- Loader -->
-      <div v-if="isShimmerLoading" class="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10 rounded-lg">
+      <div v-if="isShimmerLoading" class="absolute inset-0 bg-white/75 flex items-center justify-center z-10 rounded-lg">
         <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-red-600"></div>
       </div>
 

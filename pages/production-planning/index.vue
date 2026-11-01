@@ -236,6 +236,8 @@ const getStatusClass = (status: string) => {
 </script>
 
 <style scoped>
+@reference "tailwindcss";
+@config "~/tailwind.config.js";
 .stat-card {
   @apply bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow;
 }

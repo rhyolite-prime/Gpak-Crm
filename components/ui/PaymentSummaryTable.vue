@@ -224,6 +224,8 @@ onMounted(() => {
 </script>
 
 <style scoped>
+@reference "tailwindcss";
+@config "~/tailwind.config.js";
 .payment-summary-container {
   @apply bg-white rounded-lg shadow-sm p-6;
 }

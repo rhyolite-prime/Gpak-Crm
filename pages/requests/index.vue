@@ -463,6 +463,8 @@ function resetForm() {
 </script>
 
 <style scoped>
+@reference "tailwindcss";
+@config "~/tailwind.config.js";
 @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap');
 
 * {

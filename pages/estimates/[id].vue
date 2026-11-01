@@ -115,11 +115,11 @@
     <div v-else-if="isWorkflowLoading" class="mb-6 h-24 bg-gray-100 animate-pulse rounded-lg border border-gray-200"></div>
 
     <!-- Drag Overlay indication -->
-    <div v-if="isDraggingFormula" class="fixed inset-0 z-40 bg-red-500 bg-opacity-10 pointer-events-none transition-opacity"></div>
+    <div v-if="isDraggingFormula" class="fixed inset-0 z-40 bg-red-500/10 pointer-events-none transition-opacity"></div>
 
     <div class="relative bg-white shadow rounded-lg overflow-hidden" id="estimate-form">
       <!-- Loader -->
-      <div v-if="isShimmerLoading" class="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-50 rounded-lg">
+      <div v-if="isShimmerLoading" class="absolute inset-0 bg-white/75 flex items-center justify-center z-50 rounded-lg">
         <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-red-600"></div>
       </div>
       <div class="p-6">
@@ -1104,6 +1104,8 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+@reference "tailwindcss";
+@config "~/tailwind.config.js";
 .input-field {
     @apply mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm;
     padding: 0.5rem 0.75rem;

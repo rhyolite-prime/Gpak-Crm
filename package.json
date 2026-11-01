@@ -12,8 +12,8 @@
   "dependencies": {
     "@headlessui/vue": "^1.7.16",
     "@heroicons/vue": "^2.0.18",
-    "@nuxtjs/tailwindcss": "^6.8.4",
     "@pinia/nuxt": "^0.11.2",
+    "@tailwindcss/vite": "^4.3.3",
     "@vuelidate/core": "^2.0.3",
     "@vuelidate/validators": "^2.0.4",
     "@vueuse/core": "^14.2.1",
@@ -27,6 +27,7 @@
     "nuxt": "^3.8.0",
     "pinia": "^3.0.3",
     "qrcode": "^1",
+    "tailwindcss": "^4.3.3",
     "uuid": "^9.0.1",
     "vue-countup-v3": "^1.4.2",
     "vue-draggable-next": "^2.3.0",

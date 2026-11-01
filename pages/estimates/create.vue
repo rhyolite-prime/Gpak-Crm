@@ -86,7 +86,7 @@
     </div>
 
     <!-- Drag Overlay indication -->
-    <div v-if="isDraggingFormula" class="fixed inset-0 z-40 bg-red-500 bg-opacity-10 pointer-events-none transition-opacity"></div>
+    <div v-if="isDraggingFormula" class="fixed inset-0 z-40 bg-red-500/10 pointer-events-none transition-opacity"></div>
 
 
     <div class="bg-white shadow rounded-lg overflow-hidden" id="estimate-form">
@@ -1011,6 +1011,8 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+@reference "tailwindcss";
+@config "~/tailwind.config.js";
 .input-field {
     @apply mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm;
     padding: 0.5rem 0.75rem;

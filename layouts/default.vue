@@ -44,6 +44,8 @@ import {
 const userStore = useUserStore()
 const { signOut } = useAuth();
 const route = useRoute();
+const mobileMenuOpen = ref(false);
+watch(() => route.path, () => { mobileMenuOpen.value = false });
 
 // --- Navigation Configuration ---
 const navigation = [
@@ -268,124 +270,49 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="h-screen bg-gray-50 flex overflow-hidden">
-    <!-- Sidebar -->
-    <div class="w-80 bg-white shadow-sm border-r border-gray-200 flex flex-col fixed top-0 bottom-0 left-0 overflow-y-auto">
-      <!-- Logo -->
-      <div class="p-6 border-b border-gray-200">
-        <div class="flex items-center space-x-3">
-          <div class="w-30 h-30 rounded-lg flex items-center justify-center">
-            <img alt="GPAK Logo" src="assets/img/gpak.jpeg" style="height: 30px;" />
-          </div>
-        </div>
+  <div class="min-h-screen bg-[#f7f8f7] text-[#202b29] lg:flex">
+    <div v-if="mobileMenuOpen" class="fixed inset-0 z-30 bg-black/40 lg:hidden" @click="mobileMenuOpen = false"></div>
+    <aside :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed inset-y-0 left-0 z-40 flex w-[250px] flex-col border-r border-[#e7eae7] bg-white transition-transform duration-200 lg:translate-x-0">
+      <div class="flex h-[86px] items-center gap-3 px-6">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#b52931] text-lg font-black text-white">G</div>
+        <div><div class="text-xl font-extrabold tracking-[-0.07em] text-[#252e2c]">GPAK<span class="text-[#b52931]">.</span></div><div class="text-[9px] font-bold uppercase tracking-[0.19em] text-[#98a09d]">Print &amp; packaging</div></div>
       </div>
-
-      <!-- Navigation -->
-      <nav class="flex-1 p-4 space-y-1">
-        <!-- Changed item in navigation to item in filteredNavigation -->
+      <div class="px-6 pb-3 pt-3 text-[10px] font-bold uppercase tracking-[0.16em] text-[#a1aaa5]">Workspace</div>
+      <nav class="flex-1 space-y-1 overflow-y-auto px-3 pb-5">
         <template v-for="item in filteredNavigation" :key="item.name">
-          
-          <!-- Menu Item without children -->
-          <NuxtLink 
-            v-if="!item.children"
-            :to="item.href" 
-            class="sidebar-item"
-            :class="{ 'active': $route.path === item.href }"
-          >
-            <component :is="item.icon" class="w-5 h-5 mr-3" />
-            {{ item.name }}
+          <NuxtLink v-if="!item.children" :to="item.href" class="nav-item" :class="{ 'nav-active': $route.path === item.href }">
+            <component :is="item.icon" class="h-[18px] w-[18px] shrink-0" /><span>{{ item.name }}</span>
           </NuxtLink>
-
-          <!-- Menu Item with children (Dropdown) -->
-          <div v-else class="space-y-1">
-            <button 
-              @click="toggleMenu(item.name)"
-              class="sidebar-item w-full flex items-center justify-between"
-              :class="{ 'active': openMenus[item.name] || hasActiveChild(item.children) }"
-            >
-              <div class="flex items-center">
-                <component :is="item.icon" class="w-5 h-5 mr-3" />
-                <span>{{ item.name }}</span>
-              </div>
-              <ChevronDown 
-                class="w-4 h-4 transition-transform duration-200"
-                :class="{ 'rotate-180': openMenus[item.name] }"
-              />
+          <div v-else>
+            <button class="nav-item w-full" :class="{ 'nav-active': hasActiveChild(item.children) }" :aria-expanded="!!openMenus[item.name]" @click="toggleMenu(item.name)">
+              <component :is="item.icon" class="h-[18px] w-[18px] shrink-0" /><span class="flex-1 text-left">{{ item.name }}</span><ChevronDown class="h-4 w-4 transition-transform" :class="{ 'rotate-180': openMenus[item.name] }" />
             </button>
-
-            <!-- Dropdown Children -->
-            <div 
-              v-show="openMenus[item.name]"
-              class="pl-6 space-y-1 animate-fade-in"
-            >
-              <NuxtLink 
-                v-for="child in item.children"
-                :key="child.name"
-                :to="child.href" 
-                class="sidebar-item text-sm"
-                :class="{ 'active': $route.path === child.href }"
-              >
-                <component :is="child.icon" class="w-4 h-4 mr-3" v-if="child.icon" />
-                {{ child.name }}
-              </NuxtLink>
+            <div v-show="openMenus[item.name]" class="ml-6 border-l border-[#e8ebe8] pl-3">
+              <NuxtLink v-for="child in item.children" :key="child.name" :to="child.href" class="nav-item text-xs" :class="{ 'nav-active': $route.path === child.href }">{{ child.name }}</NuxtLink>
             </div>
           </div>
-
         </template>
       </nav>
-
-      <!-- User Profile -->
-      <div class="p-4 border-t border-gray-200">
-        <div class="flex items-center space-x-3">
-          <img 
-            src="https://res.cloudinary.com/rhyoliteprime/image/upload/v1533814738/images_6.png" 
-            alt="Evano" 
-            class="w-10 h-10 rounded-full object-cover"
-          >
-          <div class="flex-1">
-            <p class="text-sm font-medium text-gray-900"> {{ tenantName }}/{{ userName }}</p>
-            <p class="text-xs text-gray-500"></p>
-          </div>
-          <button 
-            @click="logout"
-            class="p-1 text-gray-400 hover:text-red-600 transition-colors"
-            title="Logout"
-          >
-            <LogOut class="w-4 h-4" />
-          </button>
+      <div class="border-t border-[#eef0ee] p-4">
+        <div class="flex items-center gap-3 rounded-xl bg-[#f6f8f6] p-3">
+          <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#e4ebe6] text-xs font-bold text-[#52705d]">{{ (userName || 'G').charAt(0).toUpperCase() }}</div>
+          <div class="min-w-0 flex-1"><p class="truncate text-xs font-bold">{{ userName || 'GPAK User' }}</p><p class="truncate text-[11px] text-[#8b9690]">{{ tenantName || 'Backoffice' }}</p></div>
+          <button title="Sign out" aria-label="Sign out" class="text-[#98a29c] hover:text-[#b52931]" @click="logout"><LogOut class="h-4 w-4" /></button>
         </div>
       </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="flex-1 flex flex-col ml-80 h-screen overflow-y-auto">
-      <!-- Header -->
-      <header class="bg-white border-b border-gray-200 px-6 py-4 sticky top-0 z-10">
-        <div class="flex items-center justify-between">
-          <div>
-            <h1 class="text-2xl font-semibold text-gray-900">Hello {{ userName }} 👋</h1>
-          </div>
-          <div class="flex items-center space-x-4">
-            <div class="relative">
-               <!-- user profile avatar in top corner -->
-            </div>
-          </div>
-        </div>
+    </aside>
+    <div class="min-w-0 flex-1 lg:ml-[250px]">
+      <header class="sticky top-0 z-20 flex h-[72px] items-center justify-between border-b border-[#e9ece9] bg-white/95 px-5 backdrop-blur-md md:px-9">
+        <div class="flex items-center gap-3"><button class="rounded-lg p-2 text-[#53615a] hover:bg-gray-100 lg:hidden" aria-label="Open navigation" @click="mobileMenuOpen = true"><LayoutGrid class="h-5 w-5" /></button><span class="text-sm text-[#98a39c]">Workspace</span><ChevronRight class="h-4 w-4 text-[#c4cbc6]" /><span class="text-sm font-semibold text-[#34413b]">{{ $route.path === '/' ? 'Dashboard' : ($route.path.split('/').filter(Boolean).pop() || 'Dashboard').replace(/-/g, ' ') }}</span></div>
+        <div class="flex items-center gap-3"><span class="hidden text-xs text-[#8b9690] sm:block">GPAK Backoffice</span><span class="h-7 w-px bg-[#e8ece8]"></span><div class="flex h-9 w-9 items-center justify-center rounded-full bg-[#e5eee7] text-xs font-bold text-[#496652]">{{ (userName || 'G').charAt(0).toUpperCase() }}</div></div>
       </header>
-
-      <!-- Page Content -->
-      <main class="flex-1 p-6">
-        <slot />
-      </main>
+      <main class="mx-auto max-w-[1600px] p-5 md:p-9"><slot /></main>
     </div>
   </div>
 </template>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap');
-
-* {
-  font-family: 'Sora', sans-serif;
-  font-size: 14px;
-}
+.nav-item { display:flex; align-items:center; gap:12px; min-height:41px; border-radius:8px; padding:10px 12px; color:#69766f; font-size:13px; font-weight:500; transition:all .2s; }
+.nav-item:hover { background:#f5f7f5; color:#263b2e; }
+.nav-active, .nav-active:hover { background:#eef4ef; color:#315b40; font-weight:700; }
 </style>
