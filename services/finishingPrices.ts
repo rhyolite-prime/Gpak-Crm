@@ -1,4 +1,4 @@
-import type { BaseApiResponse, BasePaginationModel, FinishingPrice } from '~/models'
+import type { BaseApiResponse, FinishingPrice } from '~/models'
 
 
 export async function getFinishingPrices(query: object) {
