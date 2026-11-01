@@ -89,6 +89,7 @@ const navigation = [
       { name: 'Work Centers', href: '/setups/work-centers', icon: Cpu },
       { name: 'Workflows', href: '/setups/workflows', icon: GitBranch },
       { name: 'Finishing Options', href: '/setups/finishing-options', icon: ClipboardCheck },
+      { name: 'Finishing Prices', href: '/setups/finishing-prices', icon: DollarSign },
       { name: 'Formula Builder', href: '/setups/formula-builder', icon: Activity },
       { name: 'Estimate Types', href: '/setups/estimates-types', icon: Tags },
       { name: 'QC Checklist', href: '/setups/qc-checklist', icon: ClipboardCheck },

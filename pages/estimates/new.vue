@@ -141,6 +141,16 @@
         <div class="flex justify-between items-end mb-4">
           <h3 class="text-sm font-bold uppercase tracking-wider text-gray-700 border-b-2 border-red-600 pb-2 inline-block">Estimation Sheet</h3>
         </div>
+        <div v-if="form.templateType === 'bookwork'" class="mb-4 rounded-xl border border-gray-200 bg-white p-4">
+          <div class="flex flex-wrap items-center justify-between gap-2"><div><h4 class="text-sm font-bold text-gray-800">Bookwork finishing</h4><p class="mt-1 text-xs text-gray-500">Collate and folding are included automatically. Choose any binding and surface finish required.</p></div><div class="flex gap-4"><button type="button" class="text-xs font-semibold text-gray-600 hover:underline" @click="finishingPrices = loadFinishingPrices()">Reload prices</button><NuxtLink to="/setups/finishing-prices" target="_blank" class="text-xs font-semibold text-red-700 hover:underline">Manage finishing prices ↗</NuxtLink></div></div>
+          <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <label class="text-xs font-semibold text-gray-600">Binding<select v-model="finishingSelection.binding" class="mt-1 w-full border border-gray-300 bg-white px-2 py-2 text-sm"><option value="">None</option><option value="perfect-bind">Perfect bind</option><option value="saddle-stitch">Saddle stitch</option><option value="case-bind">Case bind</option></select></label>
+            <label class="text-xs font-semibold text-gray-600">Surface finish<select v-model="finishingSelection.surface" class="mt-1 w-full border border-gray-300 bg-white px-2 py-2 text-sm"><option value="">None</option><option value="lamination">Lamination</option><option value="spot">Spot finish</option></select></label>
+            <template v-if="finishingSelection.surface === 'lamination'"><label class="text-xs font-semibold text-gray-600">Lamination type<select v-model="finishingSelection.laminateType" class="mt-1 w-full border border-gray-300 bg-white px-2 py-2 text-sm"><option v-for="type in LAMINATION_TYPES" :key="type" :value="type">{{ type.replace(/-/g, ' ') }}</option></select></label><label class="text-xs font-semibold text-gray-600">Laminant width (mm)<select v-model="finishingSelection.laminateSize" class="mt-1 w-full border border-gray-300 bg-white px-2 py-2 text-sm"><option v-for="size in LAMINATION_SIZES" :key="size" :value="size">{{ size }} mm</option></select></label></template>
+            <label v-if="finishingSelection.surface === 'spot'" class="text-xs font-semibold text-gray-600">Spot finish type<select v-model="finishingSelection.spotType" class="mt-1 w-full border border-gray-300 bg-white px-2 py-2 text-sm"><option v-for="type in SPOT_TYPES" :key="type" :value="type">{{ type.replace(/-/g, ' ') }}</option></select></label>
+          </div>
+          <p v-if="missingFinishingPrices" role="status" class="mt-3 text-xs text-amber-700">Some finishing prices are not set. Folding below 100 pieces has no configured price. Configure missing prices and reload before relying on the estimate total.</p>
+        </div>
         <div class="overflow-x-auto border border-gray-200 rounded-lg">
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-100">
@@ -267,19 +277,20 @@
                 <template v-else>
                   <tr v-for="row in getRowsByCategory(category)" :key="row.id" class="hover:bg-gray-50">
                     <td class="px-4 py-2">
-                      <input v-model="row.description" type="text" class="w-full border-transparent bg-transparent rounded p-1 focus:border-red-500 focus:ring-red-500 text-sm" placeholder="Item description" />
+                      <input v-model="row.description" :readonly="!!row.finishingKind" type="text" class="w-full border-transparent bg-transparent rounded p-1 focus:border-red-500 focus:ring-red-500 text-sm" placeholder="Item description" />
+                      <label v-if="row.finishingKind === 'spot'" class="mt-1 flex items-center gap-2 text-xs text-gray-600">Job overs <input v-model.number="finishingSelection.spotOvers" type="number" min="0" step="1" aria-label="Spot finish job overs" class="w-24 border border-gray-300 px-2 py-1" /></label>
                     </td>
                     <td class="px-4 py-2">
-                      <input v-model.number="row.quantity" type="number" class="w-full border border-gray-300 rounded p-1 text-right text-sm focus:ring-red-500 focus:border-red-500" step="0.01" />
+                      <input v-model.number="row.quantity" :readonly="!!row.finishingKind" type="number" class="w-full border border-gray-300 rounded p-1 text-right text-sm focus:ring-red-500 focus:border-red-500" step="0.01" />
                     </td>
                     <td class="px-4 py-2">
-                      <input v-model.number="row.unitPrice" type="number" class="w-full border border-gray-300 rounded p-1 text-right text-sm focus:ring-red-500 focus:border-red-500" step="0.01" />
+                      <input v-model.number="row.unitPrice" :readonly="!!row.finishingKind" :placeholder="row.finishingKind ? 'Not set' : ''" type="number" class="w-full border border-gray-300 rounded p-1 text-right text-sm focus:ring-red-500 focus:border-red-500" step="0.01" />
                     </td>
                     <td class="px-4 py-2 text-right text-sm font-medium text-gray-900">
                       {{ formatCurrency((row.quantity || 0) * (row.unitPrice || 0)) }}
                     </td>
                     <td class="px-4 py-2 text-right">
-                      <button type="button" @click="removeTableRow(row.id)" class="text-red-500 hover:text-red-700">
+                      <button v-if="!row.finishingKind" type="button" @click="removeTableRow(row.id)" class="text-red-500 hover:text-red-700">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                       </button>
                     </td>
@@ -359,6 +370,7 @@
 
 <script setup lang="ts">
 import { useRoute, useRouter, useNuxtApp } from '#app';
+import { defaultFinishingPrices, loadFinishingPrices, bookworkQuantities, foldingPrice, LAMINATION_TYPES, LAMINATION_SIZES, SPOT_TYPES } from '~/utils/finishingPricing';
 import { getProductionRequestDetails } from '~/services/productionRequests';
 import { getRawMaterials } from '~/services/rawMaterials';
 import { createProductionEstimate, updateProductionEstimate, getEstimateDetails } from '~/services/estimates';
@@ -401,6 +413,7 @@ interface TableRow {
   percentageTarget?: string;
   computedTotal?: number;
   quantityManuallyEdited?: boolean;
+  finishingKind?: string;
 }
 
 interface SummaryField {
@@ -408,6 +421,9 @@ interface SummaryField {
   label?: string;
   key?: string;
 }
+
+const finishingPrices = ref(defaultFinishingPrices());
+const finishingSelection = reactive({ binding: '', surface: '', laminateType: 'gloss', laminateSize: '460', spotType: '3d-matt', spotOvers: 0 });
 
 const categories = [
   'Paper info',
@@ -482,10 +498,8 @@ const templateConfigs = {
       { description: 'Printing Inside', quantity: null, unitPrice: null, category: 'Printing' },
       { description: 'Printing Cover', quantity: null, unitPrice: null, category: 'Printing' },
       { description: 'Sewing', quantity: null, unitPrice: null, category: 'Finishing' },
-      { description: 'Folding', quantity: null, unitPrice: null, category: 'Finishing' },
-      { description: 'Collate', quantity: null, unitPrice: null, category: 'Finishing' },
-      { description: 'Gloss Laminate (460)', quantity: null, unitPrice: null, category: 'Finishing' },
-      { description: 'Perfect bind', quantity: null, unitPrice: null, category: 'Finishing' },
+      { description: 'Folding', quantity: null, unitPrice: null, category: 'Finishing', finishingKind: 'folding' },
+      { description: 'Collate', quantity: null, unitPrice: null, category: 'Finishing', finishingKind: 'collate' },
       { description: 'Cost of Sample', quantity: null, unitPrice: null, category: 'Logistics & Misc' },
       { description: 'Delivery', quantity: null, unitPrice: null, category: 'Logistics & Misc' },
       { description: 'Parcelling and sorting', quantity: null, unitPrice: null, category: 'Logistics & Misc' },
@@ -546,7 +560,7 @@ watch([() => form.pages, () => form.pagesToView, () => form.pagesOut, () => form
       const cCover = form.noOfColoursCover || 0;
       s2.value = `${cInside}-Color inside, ${cCover}-colour cover`;
     }
-    const pagesInaSectionInside = (form.pages || 0) / (form.pagesToView * form.pagesOut);
+    const pagesInaSectionInside = form.pagesToView && form.pagesOut ? (form.pages || 0) / (form.pagesToView * form.pagesOut) : 0;
     const s4 = form.summaries.find(s => s.key === 'pagesInaSection');
     if (s4) s4.value = pagesInaSectionInside.toString();
     
@@ -569,7 +583,7 @@ watch([() => form.pages, () => form.pagesToView, () => form.pagesOut, () => form
     // Auto-calculate quantity for paper inside (first paper info row)
     const paperRows = form.tableRows.filter(r => r.category === 'Paper info' && !r.isPercentagePlugin);
     if (paperRows.length > 0) {
-      
+      console.log('actualSections->', actualSections)
       paperRows[0].quantity = (form.quantity || 0) * actualSections;
       // Auto-calculate quantity for paper cover (second paper info row in bookwork)
       if (paperRows.length > 1) {
@@ -593,24 +607,24 @@ watch([() => form.pages, () => form.pagesToView, () => form.pagesOut, () => form
     plateRow.quantity = form.noOfInsidePlates + coverPlates;
   }
 
-  
+  // Auto-calculate Printing Inside quantity: (Pages / PagesPerSheet) * (Quantity / RunUnit)
+  // Run Unit is a constant of 500
+  const RUN_UNIT = 500;
   const printingInsideRow = form.tableRows.find(
     r => r.category === 'Printing' && r.description.toLowerCase().includes('printing inside')
   );
-
-  //quantity for printing inside
   if (printingInsideRow) {
     const pages = form.pages || 0;
     const pagesPerSheet = form.noOfInsidePlates || 1;
     const qty = form.quantity <= 1000 ? 1000 : form.quantity;
-    printingInsideRow.quantity = (form.noOfInsidePlates * qty) / 1000;
+    printingInsideRow.quantity = (form.noOfInsidePlates * qty) / 1000; 
   }
-
-  //quantity for printing cover
+  // Auto-calculate Printing Cover quantity: (Quantity / NoOfCoversPerSheet) / RunUnitCover
+  // Run Unit for cover is a constant of 100
+  
   const printingCoverRow = form.tableRows.find(
     r => r.category === 'Printing' && r.description.toLowerCase().includes('printing cover')
   );
-
   if (printingCoverRow) {
     const qty = form.quantity || 0;
     printingCoverRow.quantity = Math.ceil((qty / 2)/1000) * form.noOfColoursCover * form.noOfCoverSides;
@@ -626,50 +640,47 @@ watch([() => form.pages, () => form.pagesToView, () => form.pagesOut, () => form
     sewingRow.quantity = form.quantity || 0;
   }
 
-  // Folding Qty = Printing Inside Qty / 8  (charged per 8-unit batch)
-  const FOLDING_BATCH = 8;
-  const printingInsideQty = (() => {
-    const pages = form.pages || 0;
-    const pps = form.noOfInsidePlates || 1;
-    const qty = form.quantity || 0;
-    return (pages / pps) * (qty / 500);
-  })();
-  const foldingRow = form.tableRows.find(
-    r => r.category === 'Finishing' && r.description.toLowerCase().includes('folding')
-  );
-  if (foldingRow) {
-    foldingRow.quantity = printingInsideQty / FOLDING_BATCH;
-  }
 
-  // Collate Qty = Folding Qty × 1000
-  const collateRow = form.tableRows.find(
-    r => r.category === 'Finishing' && r.description.toLowerCase().includes('collate')
-  );
-  if (collateRow) {
-    const foldingQty = printingInsideQty / FOLDING_BATCH;
-    collateRow.quantity = foldingQty * 1000;
-  }
-
-  // Laminate Qty = Cover Sheets × (1 + waste factor)
-  // Cover Sheets = Quantity / No. of Covers Per Sheet
-  const laminateRow = form.tableRows.find(
-    r => r.category === 'Finishing' && r.description.toLowerCase().includes('laminate')
-  );
-  if (laminateRow) {
-    const qty = form.quantity || 0;
-    const coversPerSheet = form.noOfCoversPerSheet || 1;
-    const coverSheets = qty / coversPerSheet;
-    laminateRow.quantity = coverSheets * (1 + (form.wasteFactor || 0));
-  }
-
-  // Perfect Bind Qty = Pages × Quantity
-  const perfectBindRow = form.tableRows.find(
-    r => r.category === 'Finishing' && r.description.toLowerCase().includes('perfect bind')
-  );
-  if (perfectBindRow) {
-    perfectBindRow.quantity = (form.pages || 0) * (form.quantity || 0);
-  }
 }, { immediate: true });
+
+// Maintain the automatically calculated finishing lines without touching manually added items.
+const updateBookworkFinishing = () => {
+  if (form.templateType !== 'bookwork') return;
+  const desired: Record<string, string> = { collate: 'Collate', folding: 'Folding' };
+  if (finishingSelection.binding) desired.binding = ({ 'perfect-bind': 'Perfect bind', 'saddle-stitch': 'Saddle stitch', 'case-bind': 'Case bind' } as Record<string, string>)[finishingSelection.binding];
+  if (finishingSelection.surface === 'lamination') desired.lamination = `${finishingSelection.laminateType.replace(/-/g, ' ')} lamination (${finishingSelection.laminateSize} mm)`;
+  if (finishingSelection.surface === 'spot') desired.spot = `Spot finish · ${finishingSelection.spotType.replace(/-/g, ' ')}`;
+  for (const row of [...form.tableRows]) {
+    if (row.finishingKind && !desired[row.finishingKind]) form.tableRows.splice(form.tableRows.indexOf(row), 1);
+  }
+  for (const [kind, description] of Object.entries(desired)) {
+    let row = form.tableRows.find(r => r.finishingKind === kind);
+    if (!row) { row = { id: generateId(), category: 'Finishing', finishingKind: kind, description, quantity: 0, unitPrice: null }; form.tableRows.push(row); }
+    if (row.description !== description) row.description = description;
+  }
+  const cover = form.tableRows.filter(r => r.category === 'Paper info' && !r.isPercentagePlugin)[1];
+  const coverOvers = cover ? form.tableRows.filter(r => r.isPercentagePlugin && r.percentageTarget === cover.id).reduce((sum, r) => sum + (Number(r.quantity) || 0), 0) : 0;
+  const printingCover = form.tableRows.find(r => r.category === 'Printing' && r.description.toLowerCase().includes('printing cover'));
+  const pagesInSection = form.pagesToView && form.pagesOut ? (Number(form.pages) || 0) / (Number(form.pagesToView) * Number(form.pagesOut)) : 0;
+  const qty = bookworkQuantities(pagesInSection, Number(form.quantity) || 0, Number(form.pages) || 0, Number(printingCover?.quantity) || 0, coverOvers, Number(form.noOfCoversPerSheet) || 0, Number(finishingSelection.laminateSize) || 0, Math.max(0, Number(finishingSelection.spotOvers) || 0));
+  const prices = finishingPrices.value;
+  const bindingPrice = finishingSelection.binding === 'perfect-bind' ? prices.perfectBind : finishingSelection.binding === 'saddle-stitch' ? prices.saddleStitch : prices.caseBind;
+  const values: Record<string, [number, number | null]> = {
+    collate: [qty.collate, prices.collate], folding: [qty.folding, foldingPrice(qty.collate, prices)],
+    binding: [finishingSelection.binding === 'perfect-bind' ? qty.perfectBind : qty.binding, bindingPrice],
+    lamination: [qty.lamination, prices.lamination?.[finishingSelection.laminateType]?.[finishingSelection.laminateSize] ?? null],
+    spot: [qty.spot, prices.spot?.[finishingSelection.spotType] ?? null],
+  };
+  for (const row of form.tableRows) {
+    if (!row.finishingKind || !values[row.finishingKind]) continue;
+    const [quantity, rawPrice] = values[row.finishingKind];
+    const price = typeof rawPrice === 'number' && Number.isFinite(rawPrice) ? rawPrice : null;
+    if (row.quantity !== quantity) row.quantity = quantity;
+    if (row.unitPrice !== price) row.unitPrice = price;
+  }
+};
+watch([() => form.templateType, () => form.pages, () => form.pagesToView, () => form.pagesOut, () => form.quantity, () => form.noOfCoversPerSheet, () => form.tableRows, finishingSelection, finishingPrices], updateBookworkFinishing, { deep: true });
+const missingFinishingPrices = computed(() => form.tableRows.some(row => row.finishingKind && row.unitPrice == null));
 
 // ── Inventory helpers ─────────────────────────────────────────────────────────
 const getVariantsForItem = (itemId: string) => {
@@ -783,6 +794,14 @@ const loadProductionRequest = async (id: string) => {
 
       // Reset rows for selected template
       onTemplateChange();
+      if (form.templateType === 'bookwork') {
+        const finish = details.finishingOptions ?? details.FinishingOptions ?? {};
+        const binding = finish.Binding ?? finish.binding ?? details.binding ?? '';
+        if (['perfect-bind', 'saddle-stitch', 'case-bind'].includes(binding)) finishingSelection.binding = binding;
+        const surface = finish.SurfaceFinish ?? finish.surfaceFinish ?? '';
+        if (surface.startsWith('lamination:')) { finishingSelection.surface = 'lamination'; const type = surface.split(':')[1]; if (LAMINATION_TYPES.includes(type as any)) finishingSelection.laminateType = type; }
+        if (surface.startsWith('spot-finish:')) { finishingSelection.surface = 'spot'; const type = surface.split(':')[1]; if (SPOT_TYPES.includes(type as any)) finishingSelection.spotType = type; }
+      }
 
       // Pre-populate paper info rows from production request paper fields.
       // Inventory must already be loaded before this runs (handled in onMounted ordering).
@@ -956,6 +975,9 @@ const saveEstimate = async () => {
       makeVar('Tax %',                  'taxPercentage',         String(form.taxPercentage ?? 20)),
       // Summary fields (JSON-encoded so the edit page can restore them)
       makeVar('Summaries',              'summaries',             JSON.stringify(form.summaries)),
+      makeVar('Finishing selection', 'finishingSelection', JSON.stringify(finishingSelection)),
+      makeVar('Finishing prices', 'finishingPrices', JSON.stringify(finishingPrices.value)),
+      makeVar('Estimate rows', 'estimateRows', JSON.stringify(form.tableRows)),
     ];
 
     // ── Map tableRows → details (EstimateItem shape) ───────────────────────
@@ -1096,8 +1118,15 @@ const loadEstimateForEdit = async (id: string) => {
     // ── Reset template rows first, then patch quantities/prices from details ─
     onTemplateChange();
 
+    const savedSelection = getVar(vars, 'finishingSelection');
+    const savedPrices = getVar(vars, 'finishingPrices');
+    const savedRows = getVar(vars, 'estimateRows');
+    try { if (savedSelection) Object.assign(finishingSelection, JSON.parse(savedSelection)); } catch { /* retain defaults */ }
+    try { if (savedPrices) finishingPrices.value = JSON.parse(savedPrices); } catch { /* retain browser prices */ }
+    let restoredRows = false;
+    try { const rows = savedRows && JSON.parse(savedRows); if (Array.isArray(rows)) { form.tableRows = rows; restoredRows = true; } } catch { /* fall back to legacy details */ }
     const savedDetails: any[] = estimate.details ?? [];
-    savedDetails.forEach(d => {
+    if (!restoredRows) savedDetails.forEach(d => {
       // Try to match against an existing template row by description
       const match = form.tableRows.find(
         r => r.description.toLowerCase() === (d.itemName ?? '').toLowerCase()
@@ -1120,7 +1149,7 @@ const loadEstimateForEdit = async (id: string) => {
     // Re-apply paper inventory from the production request if still linked
     if (estimate.productionRequestId) {
       prodRequestId.value = estimate.productionRequestId;
-      await applyPaperFromProductionRequest(estimate);
+      if (!restoredRows) await applyPaperFromProductionRequest(estimate);
     }
 
   } catch (e) {
@@ -1133,6 +1162,7 @@ const loadEstimateForEdit = async (id: string) => {
 
 // ── Initialization ────────────────────────────────────────────────────────────
 onMounted(async () => {
+  finishingPrices.value = loadFinishingPrices();
   onTemplateChange();
 
   try {
