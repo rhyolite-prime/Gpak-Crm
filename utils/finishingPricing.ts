@@ -16,6 +16,39 @@ export function defaultFinishingPrices(): FinishingPrices {
     spot: Object.fromEntries(SPOT_TYPES.map(type => [type, null])),
   }
 }
+/** Blank setup for first-time entry; unlike estimate defaults, no prices are assumed. */
+export function emptyFinishingPrices(): FinishingPrices {
+  return {
+    collate: null, foldingTiers: [], perfectBind: null, saddleStitch: null, caseBind: null,
+    lamination: Object.fromEntries(LAMINATION_TYPES.map(type => [type, Object.fromEntries(LAMINATION_SIZES.map(size => [size, null]))])),
+    spot: Object.fromEntries(SPOT_TYPES.map(type => [type, null])),
+  }
+}
+
+/** API returns one setup or null. Merge only values actually supplied by the API. */
+export function finishingPricesFromApi(value: unknown): FinishingPrices | null {
+  if (value == null) return null
+  if (typeof value !== 'object' || Array.isArray(value)) throw new Error('Unexpected finishing prices response')
+  const data = value as Record<string, any>
+  if (!Object.keys(data).length) return null
+  const keys = ['collate', 'perfectBind', 'saddleStitch', 'caseBind', 'foldingTiers', 'lamination', 'spot', 'foldingUpTo1000', 'foldingAbove1000']
+  if (!keys.some(key => Object.prototype.hasOwnProperty.call(data, key))) throw new Error('Unexpected finishing prices response')
+  const blank = emptyFinishingPrices()
+  const tiers = data.foldingTiers == null
+    ? (('foldingUpTo1000' in data || 'foldingAbove1000' in data) ? getFoldingTiers(data) : [])
+    : data.foldingTiers
+  if (!Array.isArray(tiers)) throw new Error('Unexpected folding price bands')
+  for (const key of ['lamination', 'spot']) {
+    if (data[key] != null && (typeof data[key] !== 'object' || Array.isArray(data[key]))) throw new Error('Unexpected finishing prices response')
+  }
+  return {
+    collate: data.collate ?? null, perfectBind: data.perfectBind ?? null,
+    saddleStitch: data.saddleStitch ?? null, caseBind: data.caseBind ?? null,
+    foldingTiers: tiers.map(tier => ({ minQuantity: tier.minQuantity, maxQuantity: tier.maxQuantity ?? null, price: tier.price ?? null })),
+    lamination: Object.fromEntries(LAMINATION_TYPES.map(type => [type, { ...blank.lamination[type], ...data.lamination?.[type] }])),
+    spot: { ...blank.spot, ...data.spot },
+  }
+}
 export function loadFinishingPrices(): FinishingPrices {
   const defaults = defaultFinishingPrices()
   if (typeof localStorage === 'undefined') return defaults

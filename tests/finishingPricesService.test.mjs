@@ -1,33 +1,31 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { getFinishingPrices, getFinishingPrice, createFinishingPrice, updateFinishingPrice, deleteFinishingPrice } from '../services/finishingPrices.ts'
+import { getFinishingPrices, createFinishingPrice } from '../services/finishingPrices.ts'
 
-test('CRUD service passes IDs, query and payload to the expected routes', async () => {
+test('service retrieves the single setup and sends create requests', async () => {
   const calls = []
+  const setup = { collate: 0.075, foldingTiers: [] }
   globalThis.httpClient = async (path, options) => {
     calls.push({ path, options })
-    return { success: true, result: { id: 'id/1', data: [] } }
+    return { success: true, result: setup }
   }
   try {
-    const query = { pageNo: 1, pageSize: 10, category: 'binding' }
-    const payload = { currency: 'GHS', category: 'binding', option: 'case-bind', sizeMm: null, minQuantity: null, maxQuantity: null, unitPrice: 0.4 }
-    assert.deepEqual(await getFinishingPrices(query), { id: 'id/1', data: [] })
-    assert.deepEqual(await getFinishingPrice('id/1'), { id: 'id/1', data: [] })
-    assert.equal(await createFinishingPrice(payload), true)
-    assert.equal(await updateFinishingPrice({ ...payload, id: 'id/1' }), true)
-    assert.equal(await deleteFinishingPrice('id/1'), true)
+    assert.deepEqual(await getFinishingPrices(), setup)
+    assert.equal(await createFinishingPrice(setup), true)
     assert.deepEqual(calls, [
-      { path: 'finishingprice/getall', options: { query } },
-      { path: 'finishingprice/getdetails', options: { query: { id: 'id/1' } } },
-      { path: 'finishingprice/create', options: { method: 'post', body: payload } },
-      { path: 'finishingprice/update', options: { method: 'post', body: { ...payload, id: 'id/1' } } },
-      { path: 'finishingprice/delete', options: { method: 'delete', query: { id: 'id/1' } } },
+      { path: 'FinishingOptionPrice/ListAll', options: undefined },
+      { path: 'FinishingOptionPrice/create', options: { method: 'post', body: setup } },
     ])
   } finally { delete globalThis.httpClient }
 })
 
-test('service propagates request failures', async () => {
-  globalThis.httpClient = async () => { throw new Error('network failure') }
-  try { await assert.rejects(deleteFinishingPrice('id'), /network failure/) }
-  finally { delete globalThis.httpClient }
+test('service distinguishes API failure from an empty setup', async () => {
+  globalThis.httpClient = async () => ({ success: true, result: null })
+  try {
+    assert.equal(await getFinishingPrices(), null)
+    globalThis.httpClient = async () => ({ success: false, result: null, error: { message: 'Load failed' } })
+    await assert.rejects(getFinishingPrices(), /Load failed/)
+    globalThis.httpClient = async () => { throw new Error('network failure') }
+    await assert.rejects(getFinishingPrices(), /network failure/)
+  } finally { delete globalThis.httpClient }
 })
