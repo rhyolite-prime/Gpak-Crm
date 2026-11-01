@@ -3,7 +3,7 @@ import type { BaseApiResponse, BasePaginationModel, FinishingPrice } from '~/mod
 
 export async function getFinishingPrices(query: object) {
  
-  const response = await httpClient<BaseApiResponse<BasePaginationModel<FinishingPrice[]>>>('FinishingOptionPrice/ListAll', { query });
+  const response = await httpClient<BaseApiResponse<FinishingPrice>>('FinishingOptionPrice/ListAll', { query });
   return response.result;
 }
 
