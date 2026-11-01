@@ -149,7 +149,7 @@
             <template v-if="finishingSelection.surface === 'lamination'"><label class="text-xs font-semibold text-gray-600">Lamination type<select v-model="finishingSelection.laminateType" class="mt-1 w-full border border-gray-300 bg-white px-2 py-2 text-sm"><option v-for="type in LAMINATION_TYPES" :key="type" :value="type">{{ type.replace(/-/g, ' ') }}</option></select></label><label class="text-xs font-semibold text-gray-600">Laminant width (mm)<select v-model="finishingSelection.laminateSize" class="mt-1 w-full border border-gray-300 bg-white px-2 py-2 text-sm"><option v-for="size in LAMINATION_SIZES" :key="size" :value="size">{{ size }} mm</option></select></label></template>
             <label v-if="finishingSelection.surface === 'spot'" class="text-xs font-semibold text-gray-600">Spot finish type<select v-model="finishingSelection.spotType" class="mt-1 w-full border border-gray-300 bg-white px-2 py-2 text-sm"><option v-for="type in SPOT_TYPES" :key="type" :value="type">{{ type.replace(/-/g, ' ') }}</option></select></label>
           </div>
-          <p v-if="missingFinishingPrices" role="status" class="mt-3 text-xs text-amber-700">Some finishing prices are not set. Folding below 100 pieces has no configured price. Configure missing prices and reload before relying on the estimate total.</p>
+          <p v-if="missingFinishingPrices" role="status" class="mt-3 text-xs text-amber-700">Some finishing prices are not set or no folding price band matches. Configure prices and reload before relying on the estimate total.</p>
         </div>
         <div class="overflow-x-auto border border-gray-200 rounded-lg">
           <table class="min-w-full divide-y divide-gray-200">
@@ -246,7 +246,7 @@
                         <input v-model.number="row.unitPrice" type="number" class="w-full border border-gray-300 rounded p-1 text-right text-sm focus:ring-red-500 focus:border-red-500" step="0.01" />
                       </td>
                       <td class="px-4 py-2 text-right text-sm font-medium text-gray-900">
-                        {{ formatCurrency((row.quantity || 0) * (row.unitPrice || 0)) }}
+                        {{ formatCurrency(lineTotal(row)) }}
                       </td>
                       <td class="px-4 py-2 text-right">
                         <button type="button" @click="removeTableRow(row.id)" class="text-red-500 hover:text-red-700">
@@ -284,10 +284,11 @@
                       <input v-model.number="row.quantity" :readonly="!!row.finishingKind" type="number" class="w-full border border-gray-300 rounded p-1 text-right text-sm focus:ring-red-500 focus:border-red-500" step="0.01" />
                     </td>
                     <td class="px-4 py-2">
-                      <input v-model.number="row.unitPrice" :readonly="!!row.finishingKind" :placeholder="row.finishingKind ? 'Not set' : ''" type="number" class="w-full border border-gray-300 rounded p-1 text-right text-sm focus:ring-red-500 focus:border-red-500" step="0.01" />
+                      <input v-model.number="row.unitPrice" :readonly="!!row.finishingKind" :placeholder="row.finishingKind ? 'Not set' : ''" type="number" class="w-full border border-gray-300 rounded p-1 text-right text-sm focus:ring-red-500 focus:border-red-500" step="any" />
+                      <span v-if="row.finishingKind === 'folding'" class="block text-right text-xs text-gray-500">Flat band price</span>
                     </td>
                     <td class="px-4 py-2 text-right text-sm font-medium text-gray-900">
-                      {{ formatCurrency((row.quantity || 0) * (row.unitPrice || 0)) }}
+                      {{ formatCurrency(lineTotal(row)) }}
                     </td>
                     <td class="px-4 py-2 text-right">
                       <button v-if="!row.finishingKind" type="button" @click="removeTableRow(row.id)" class="text-red-500 hover:text-red-700">
@@ -897,7 +898,7 @@ const applyPaperFromProductionRequest = async (pr: any) => {
 const subTotal = computed(() => {
   const itemsTotal = form.tableRows.reduce((sum, row) => {
     if (row.isPercentagePlugin) return sum + (row.computedTotal || 0);
-    return sum + ((row.quantity || 0) * (row.unitPrice || 0));
+    return sum + lineTotal(row);
   }, 0);
   return itemsTotal + (form.directLabour || 0);
 });
@@ -928,6 +929,9 @@ const removeTableRow = (id: string) => {
 };
 
 const getRowsByCategory = (category: string) => form.tableRows.filter(r => r.category === category);
+const lineTotal = (row: TableRow) => row.finishingKind === 'folding'
+  ? (row.quantity ? (row.unitPrice ?? 0) : 0)
+  : (row.quantity || 0) * (row.unitPrice || 0);
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat('en-GH', { style: 'currency', currency: 'GHS' }).format(value);
@@ -947,7 +951,7 @@ const saveEstimate = async () => {
     // ── Computed totals ───────────────────────────────────────────────────────
     const subTotal = form.tableRows.reduce((sum, r) => {
       if (r.isPercentagePlugin) return sum + (r.computedTotal || 0);
-      return sum + (r.quantity || 0) * (r.unitPrice || 0);
+      return sum + lineTotal(r);
     }, 0);
     const unitCostOfProduction = form.quantity ? subTotal / form.quantity : 0;
     const marginAmount = subTotal * (form.marginPercentage / 100);
@@ -984,7 +988,9 @@ const saveEstimate = async () => {
     const details = form.tableRows.map(r => ({
       itemName:           r.description,
       quantity:           r.quantity ?? 0,
-      unitPrice:          r.unitPrice ?? 0,
+      // Persist an effective per-batch price so legacy consumers multiplying
+      // quantity by unitPrice still get the flat folding charge.
+      unitPrice:          r.finishingKind === 'folding' ? (r.quantity ? (r.unitPrice ?? 0) / r.quantity : 0) : (r.unitPrice ?? 0),
       isFormula:          false,
       isSteppingStone:    false,
       formulaOutput:      0,
