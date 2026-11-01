@@ -36,6 +36,7 @@ export { useHttpClient, getBusinessAuthIdentityHeaders } from '../composables/us
 export { usePermissions } from '../composables/usePermssions';
 export { dateAndTimeFormat, standardDateFormat, longDateFormat, rawTimeFormat, longDateAndTimeFormat, dateFormat, isoDateFormat, shortDateFormat, _currency, toNumber, toAbs } from '../utils/filters';
 export { finishingSlug, serializeFinishingOptions, parseSurfaceFinish } from '../utils/finishingOptions';
+export { LAMINATION_TYPES, LAMINATION_SIZES, SPOT_TYPES, PRICING_KEY, defaultFinishingPrices, loadFinishingPrices, bookworkQuantities, foldingPrice, buildFinishingPricesRequest, FinishingPrices, FinishingPriceRecord, FinishingPricesSaveRequest } from '../utils/finishingPricing';
 export { isMobileScreen, getCurrentDate, formatAscurrency, generateReceiptNumber, generateUniqueIdentifier, generateSku, buildQueryParams, filterQueryParams, replacePartOfString, scrollTop, isValidEmail, isValidPhoneNumber, isNullOrUndefined, isUndefined, isNumber, isString, addPossesive, generateEmptyGuid } from '../utils/helpers';
 export { NewsPaper } from '../services/customers';
 export { getActivityLogs, getSummaryStats } from '../services/dashboard';
@@ -44,6 +45,7 @@ export { getEstimateTypes, createEstimateType, updateEstimateType, deleteEstimat
 export { getProductionEstimates, getEstimateDetails, approveEstimate, rejectEstimate, checkIfEstimateExistsForRequestId, createProductionEstimate, updateProductionEstimate, getEstimateStats, updateProductionEstimateStatus, deleteEstimate } from '../services/estimates';
 export { getFinishedGoods, createFinishedGood, updateFinishedGood, deleteFinishedGood } from '../services/finishedGoods';
 export { getFinishingOptions, createFinishingOption, updateFinishingOption, deleteFinishingOption } from '../services/finishingOptions';
+export { getFinishingPrices, createFinishingPrice, updateFinishingPrice, FinishingPrice, CreateFinishingPriceRequest, UpdateFinishingPriceRequest, FinishingPriceQuery } from '../services/finishingPrices';
 export { getVariables, createVariable, updateVariable, deleteVariable, getFormulas, createFormula, updateFormula, deleteFormula } from '../services/formulas';
 export { getInvoices, getInvoiceStats, getInvoiceDetails } from '../services/invoices';
 export { getPayments, getPaymentStats, updatePaymentStatus } from '../services/payments';

@@ -16,33 +16,19 @@ export async function getFinishingPrices(query: FinishingPriceQuery) {
   const response = await httpClient<BaseApiResponse<BasePaginationModel<FinishingPrice[]>>>(
     'finishingprice/getall', { query: { ...query } },
   )
-  return response.result
-}
-
-export async function getFinishingPrice(id: string) {
-  const response = await httpClient<BaseApiResponse<FinishingPrice>>(
-    'finishingprice/getdetails', { query: { id } },
-  )
-  return response.result
+  return response.result;
 }
 
 export async function createFinishingPrice(payload: CreateFinishingPriceRequest) {
   const response = await httpClient<BaseApiResponse<object>>(
     'finishingprice/create', { method: 'post', body: payload },
   )
-  return response.success
+  return response.success;
 }
 
 export async function updateFinishingPrice(payload: UpdateFinishingPriceRequest) {
   const response = await httpClient<BaseApiResponse<object>>(
     'finishingprice/update', { method: 'post', body: payload },
   )
-  return response.success
-}
-
-export async function deleteFinishingPrice(id: string) {
-  const response = await httpClient<BaseApiResponse<object>>(
-    'finishingprice/delete', { method: 'delete', query: { id } },
-  )
-  return response.success
+  return response.success;
 }
