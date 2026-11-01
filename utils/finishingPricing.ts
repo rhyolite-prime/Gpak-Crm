@@ -33,3 +33,41 @@ export function foldingPrice(pieces: number, prices: FinishingPrices) {
   if (pieces < 100) return null
   return pieces <= 1000 ? prices.foldingUpTo1000 : prices.foldingAbove1000
 }
+
+/** A complete replacement of the finishing price setup for the authenticated tenant. */
+export type FinishingPriceRecord = {
+  category: 'collate' | 'folding' | 'binding' | 'lamination' | 'spot-finish'
+  option: string
+  sizeMm: number | null
+  minQuantity: number | null
+  maxQuantity: number | null
+  unitPrice: number | null
+}
+export type FinishingPricesSaveRequest = { currency: 'GHS'; prices: FinishingPriceRecord[] }
+
+/** Blank prices are sent as null (unset), not as zero. Zero is a valid price. */
+export function buildFinishingPricesRequest(prices: FinishingPrices): FinishingPricesSaveRequest {
+  const price = (value: unknown): number | null => {
+    if (value === '' || value === null || value === undefined) return null
+    if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) {
+      throw new Error('Finishing prices must be non-negative numbers or blank.')
+    }
+    return value
+  }
+  const record = (category: FinishingPriceRecord['category'], option: string, unitPrice: unknown, sizeMm: number | null = null, minQuantity: number | null = null, maxQuantity: number | null = null): FinishingPriceRecord => ({
+    category, option, sizeMm, minQuantity, maxQuantity, unitPrice: price(unitPrice),
+  })
+  return {
+    currency: 'GHS',
+    prices: [
+      record('collate', 'collate', prices.collate),
+      record('folding', 'folding', prices.foldingUpTo1000, null, 100, 1000),
+      record('folding', 'folding', prices.foldingAbove1000, null, 1001, null),
+      record('binding', 'perfect-bind', prices.perfectBind),
+      record('binding', 'saddle-stitch', prices.saddleStitch),
+      record('binding', 'case-bind', prices.caseBind),
+      ...LAMINATION_TYPES.flatMap(type => LAMINATION_SIZES.map(size => record('lamination', type, prices.lamination?.[type]?.[size], Number(size)))),
+      ...SPOT_TYPES.map(type => record('spot-finish', type, prices.spot?.[type])),
+    ],
+  }
+}

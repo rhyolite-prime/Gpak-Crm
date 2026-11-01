@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { LAMINATION_TYPES, LAMINATION_SIZES, SPOT_TYPES, PRICING_KEY, loadFinishingPrices, defaultFinishingPrices } from '~/utils/finishingPricing'
+import { LAMINATION_TYPES, LAMINATION_SIZES, SPOT_TYPES, PRICING_KEY, loadFinishingPrices, defaultFinishingPrices, buildFinishingPricesRequest } from '~/utils/finishingPricing'
 definePageMeta({ layout: 'default', middleware: 'auth' })
 useHead({ title: 'Finishing price setup' })
 const prices = ref(defaultFinishingPrices())
@@ -14,8 +14,13 @@ const fields = [
   { key: 'caseBind', label: 'Case bind', hint: 'Per piece' },
 ] as const
 const save = () => {
-  try { localStorage.setItem(PRICING_KEY, JSON.stringify(prices.value)); saved.value = true }
-  catch { alert('Unable to save prices in this browser.') }
+  try {
+    // Construct and validate the database request contract before saving locally.
+    // No pricing endpoint exists yet; do not claim the payload was sent.
+    buildFinishingPricesRequest(prices.value)
+    localStorage.setItem(PRICING_KEY, JSON.stringify(prices.value))
+    saved.value = true
+  } catch (error) { alert(error instanceof Error ? error.message : 'Unable to save prices in this browser.') }
 }
 const title = (value: string) => value.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
 </script>
