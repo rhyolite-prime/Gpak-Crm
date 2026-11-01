@@ -24,14 +24,9 @@ const loadPrices = async () => {
   isLoading.value = true
   loadError.value = ''
   try {
-    const result = await getFinishingPrices({ pageNo: 1, pageSize: 100 })
-    if (!result || !Array.isArray(result.data)) throw new Error('Unexpected response from the finishing prices service.')
+    const result = await getFinishingPrices()
     records.value = result.data
-    totalCount.value = result.totalCount ?? result.data.length
-    selectedId.value = result.data[0]?.id ?? ''
-    if (records.value.length && !selectedId.value) throw new Error('The returned price setup has no ID.')
-    if (selectedId.value) selectRecord()
-    else prices.value = defaultFinishingPrices()
+     
   } catch (error) {
     console.error('Unable to load finishing prices:', error)
     loadError.value = 'Unable to load finishing prices. Please try again.'
