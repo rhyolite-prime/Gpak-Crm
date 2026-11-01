@@ -565,7 +565,7 @@ watch([() => form.pages, () => form.pagesToView, () => form.pagesOut, () => form
     // Auto-calculate quantity for paper inside (first paper info row)
     const paperRows = form.tableRows.filter(r => r.category === 'Paper info' && !r.isPercentagePlugin);
     if (paperRows.length > 0) {
-      console.log('actualSections->', actualSections)
+      
       paperRows[0].quantity = (form.quantity || 0) * actualSections;
       // Auto-calculate quantity for paper cover (second paper info row in bookwork)
       if (paperRows.length > 1) {

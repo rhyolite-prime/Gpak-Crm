@@ -15,6 +15,7 @@ interface _GlobalComponents {
       'BasePagination': typeof import("../components/base/pagination.vue")['default']
     'UiActionVerificationModal': typeof import("../components/ui/ActionVerificationModal.vue")['default']
     'UiDeleteConfirmationModal': typeof import("../components/ui/DeleteConfirmationModal.vue")['default']
+    'UiFinishingOptions': typeof import("../components/ui/FinishingOptions.vue")['default']
     'UiPaymentSummaryTable': typeof import("../components/ui/PaymentSummaryTable.vue")['default']
     'WebsiteFooter': typeof import("../components/website/Footer.vue")['default']
     'WebsiteNavbar': typeof import("../components/website/Navbar.vue")['default']
@@ -45,6 +46,7 @@ interface _GlobalComponents {
       'LazyBasePagination': LazyComponent<typeof import("../components/base/pagination.vue")['default']>
     'LazyUiActionVerificationModal': LazyComponent<typeof import("../components/ui/ActionVerificationModal.vue")['default']>
     'LazyUiDeleteConfirmationModal': LazyComponent<typeof import("../components/ui/DeleteConfirmationModal.vue")['default']>
+    'LazyUiFinishingOptions': LazyComponent<typeof import("../components/ui/FinishingOptions.vue")['default']>
     'LazyUiPaymentSummaryTable': LazyComponent<typeof import("../components/ui/PaymentSummaryTable.vue")['default']>
     'LazyWebsiteFooter': LazyComponent<typeof import("../components/website/Footer.vue")['default']>
     'LazyWebsiteNavbar': LazyComponent<typeof import("../components/website/Navbar.vue")['default']>
@@ -81,6 +83,7 @@ declare module 'vue' {
 export const BasePagination: typeof import("../components/base/pagination.vue")['default']
 export const UiActionVerificationModal: typeof import("../components/ui/ActionVerificationModal.vue")['default']
 export const UiDeleteConfirmationModal: typeof import("../components/ui/DeleteConfirmationModal.vue")['default']
+export const UiFinishingOptions: typeof import("../components/ui/FinishingOptions.vue")['default']
 export const UiPaymentSummaryTable: typeof import("../components/ui/PaymentSummaryTable.vue")['default']
 export const WebsiteFooter: typeof import("../components/website/Footer.vue")['default']
 export const WebsiteNavbar: typeof import("../components/website/Navbar.vue")['default']
@@ -111,6 +114,7 @@ export const NuxtRouteAnnouncer: typeof import("../node_modules/.pnpm/nuxt@3.17.
 export const LazyBasePagination: LazyComponent<typeof import("../components/base/pagination.vue")['default']>
 export const LazyUiActionVerificationModal: LazyComponent<typeof import("../components/ui/ActionVerificationModal.vue")['default']>
 export const LazyUiDeleteConfirmationModal: LazyComponent<typeof import("../components/ui/DeleteConfirmationModal.vue")['default']>
+export const LazyUiFinishingOptions: LazyComponent<typeof import("../components/ui/FinishingOptions.vue")['default']>
 export const LazyUiPaymentSummaryTable: LazyComponent<typeof import("../components/ui/PaymentSummaryTable.vue")['default']>
 export const LazyWebsiteFooter: LazyComponent<typeof import("../components/website/Footer.vue")['default']>
 export const LazyWebsiteNavbar: LazyComponent<typeof import("../components/website/Navbar.vue")['default']>
