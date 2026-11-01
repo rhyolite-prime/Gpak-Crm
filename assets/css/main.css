@@ -30,11 +30,11 @@
   }
   
   .btn-primary {
-    @apply bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors duration-200;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-[#315b40] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-[#254b33];
   }
   
   .btn-secondary {
-    @apply bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors duration-200;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-[#dce5dd] bg-white px-4 py-2.5 text-sm font-semibold text-[#52675a] shadow-sm transition-colors duration-200 hover:bg-[#f2f7f3];
   }
   
   .modal-overlay {
@@ -182,4 +182,63 @@
   .quick-action-icon {
     transition: transform 0.25s ease;
   }
+}
+/* A consistent, accessible control language for the backoffice. Existing
+   utility classes can still set sizing, spacing, and semantic button colors. */
+@layer components {
+  :where(.backoffice) :where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]), select, textarea) {
+    border: 1px solid #dce5dd;
+    border-radius: 0.625rem;
+    background-color: #fff;
+    color: #34443a;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    box-shadow: 0 1px 2px rgb(35 55 40 / 3%);
+    transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+  }
+
+  :where(.backoffice) :where(input, textarea)::placeholder {
+    color: #a0aca4;
+    opacity: 1;
+  }
+
+  :where(.backoffice) :where(input[type="checkbox"], input[type="radio"]) {
+    accent-color: #497a57;
+  }
+
+  :where(.backoffice) :where(button, [type="button"], [type="submit"], [type="reset"]) {
+    cursor: pointer;
+    transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, opacity 160ms ease;
+  }
+}
+
+/* Focus and disabled states must remain visible even on older utility-based forms. */
+.backoffice :where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]), select, textarea):focus {
+  outline: none;
+  border-color: #79a985;
+  box-shadow: 0 0 0 3px rgb(105 159 119 / 18%);
+}
+.backoffice :where(button, a, input, select, textarea):focus-visible {
+  outline: 2px solid #609a6e;
+  outline-offset: 2px;
+}
+.backoffice :where(button, input, select, textarea):disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Keep the various legacy forms visually aligned without changing their layout
+   or overriding validation colors and destructive-action semantics. */
+.backoffice :where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]), select, textarea) {
+  border-radius: 0.625rem;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+.backoffice :where(input, textarea)::placeholder { color: #a0aca4; opacity: 1; }
+.backoffice :where(button[class*="px-"], a[class*="px-"][class*="bg-"]) {
+  border-radius: 0.625rem;
+  font-weight: 600;
+  transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+.backoffice :where(button[class*="px-"]:not(:disabled), a[class*="px-"][class*="bg-"]):hover {
+  box-shadow: 0 3px 10px rgb(35 55 40 / 10%);
 }

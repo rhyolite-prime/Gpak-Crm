@@ -270,7 +270,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#f7f8f7] text-[#202b29] lg:flex">
+  <div class="backoffice min-h-screen bg-[#f7f8f7] text-[#202b29] lg:flex">
     <div v-if="mobileMenuOpen" class="fixed inset-0 z-30 bg-black/40 lg:hidden" @click="mobileMenuOpen = false"></div>
     <aside :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed inset-y-0 left-0 z-40 flex w-[250px] flex-col border-r border-[#e7eae7] bg-white transition-transform duration-200 lg:translate-x-0">
       <div class="flex h-[86px] items-center gap-3 px-6">
