@@ -36,13 +36,14 @@ export { useHttpClient, getBusinessAuthIdentityHeaders } from '../composables/us
 export { usePermissions } from '../composables/usePermssions';
 export { dateAndTimeFormat, standardDateFormat, longDateFormat, rawTimeFormat, longDateAndTimeFormat, dateFormat, isoDateFormat, shortDateFormat, _currency, toNumber, toAbs } from '../utils/filters';
 export { finishingSlug, serializeFinishingOptions, parseSurfaceFinish } from '../utils/finishingOptions';
-export { LAMINATION_TYPES, LAMINATION_SIZES, SPOT_TYPES, PRICING_KEY, defaultFinishingPrices, emptyFinishingPrices, finishingPricesFromApi, loadFinishingPrices, bookworkQuantities, getFoldingTiers, toFinishingPricesPayload, foldingPrice, validateFoldingTiers, buildFinishingPricesRequest, FoldingTier, FinishingPrices, FinishingPriceRecord, FinishingPricesSaveRequest } from '../utils/finishingPricing';
+export { LAMINATION_TYPES, LAMINATION_SIZES, SPOT_TYPES, defaultFinishingPrices, emptyFinishingPrices, finishingPricesFromApi, bookworkQuantities, getFoldingTiers, toFinishingPricesPayload, foldingPrice, validateFoldingTiers, buildFinishingPricesRequest, FoldingTier, FinishingPrices, FinishingPriceRecord, FinishingPricesSaveRequest } from '../utils/finishingPricing';
 export { isMobileScreen, getCurrentDate, formatAscurrency, generateReceiptNumber, generateUniqueIdentifier, generateSku, buildQueryParams, filterQueryParams, replacePartOfString, scrollTop, isValidEmail, isValidPhoneNumber, isNullOrUndefined, isUndefined, isNumber, isString, addPossesive, generateEmptyGuid } from '../utils/helpers';
 export { NewsPaper } from '../services/customers';
 export { getActivityLogs, getSummaryStats } from '../services/dashboard';
 export { getDepartments, createDepartment, updateDepartment, deleteDepartment } from '../services/departments';
 export { getEstimateTypes, createEstimateType, updateEstimateType, deleteEstimateType } from '../services/estimateTypes';
 export { getProductionEstimates, getEstimateDetails, approveEstimate, rejectEstimate, checkIfEstimateExistsForRequestId, createProductionEstimate, updateProductionEstimate, getEstimateStats, updateProductionEstimateStatus, deleteEstimate } from '../services/estimates';
+export { getFinishedArtefactSizes, createFinishedArtefactSize, updateFinishedArtefactSize, deleteFinishedArtefactSize } from '../services/finishedArtefactSizes';
 export { getFinishedGoods, createFinishedGood, updateFinishedGood, deleteFinishedGood } from '../services/finishedGoods';
 export { getFinishingOptions, createFinishingOption, updateFinishingOption, deleteFinishingOption } from '../services/finishingOptions';
 export { getFinishingPrices, createFinishingPrice } from '../services/finishingPrices';

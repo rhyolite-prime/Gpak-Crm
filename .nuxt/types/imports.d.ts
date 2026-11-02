@@ -3,7 +3,6 @@ export {}
 declare global {
   const LAMINATION_SIZES: typeof import('../../utils/finishingPricing')['LAMINATION_SIZES']
   const LAMINATION_TYPES: typeof import('../../utils/finishingPricing')['LAMINATION_TYPES']
-  const PRICING_KEY: typeof import('../../utils/finishingPricing')['PRICING_KEY']
   const SPOT_TYPES: typeof import('../../utils/finishingPricing')['SPOT_TYPES']
   const _currency: typeof import('../../utils/filters')['_currency']
   const abortNavigation: typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/composables/router')['abortNavigation']
@@ -30,6 +29,7 @@ declare global {
   const createDepartment: typeof import('../../services/departments')['createDepartment']
   const createError: typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/composables/error')['createError']
   const createEstimateType: typeof import('../../services/estimateTypes')['createEstimateType']
+  const createFinishedArtefactSize: typeof import('../../services/finishedArtefactSizes')['createFinishedArtefactSize']
   const createFinishedGood: typeof import('../../services/finishedGoods')['createFinishedGood']
   const createFinishingOption: typeof import('../../services/finishingOptions')['createFinishingOption']
   const createFinishingPrice: typeof import('../../services/finishingPrices')['createFinishingPrice']
@@ -72,6 +72,7 @@ declare global {
   const deleteDepartment: typeof import('../../services/departments')['deleteDepartment']
   const deleteEstimate: typeof import('../../services/estimates')['deleteEstimate']
   const deleteEstimateType: typeof import('../../services/estimateTypes')['deleteEstimateType']
+  const deleteFinishedArtefactSize: typeof import('../../services/finishedArtefactSizes')['deleteFinishedArtefactSize']
   const deleteFinishedGood: typeof import('../../services/finishedGoods')['deleteFinishedGood']
   const deleteFinishingOption: typeof import('../../services/finishingOptions')['deleteFinishingOption']
   const deleteFormula: typeof import('../../services/formulas')['deleteFormula']
@@ -114,6 +115,7 @@ declare global {
   const getEstimateDetails: typeof import('../../services/estimates')['getEstimateDetails']
   const getEstimateStats: typeof import('../../services/estimates')['getEstimateStats']
   const getEstimateTypes: typeof import('../../services/estimateTypes')['getEstimateTypes']
+  const getFinishedArtefactSizes: typeof import('../../services/finishedArtefactSizes')['getFinishedArtefactSizes']
   const getFinishedGoods: typeof import('../../services/finishedGoods')['getFinishedGoods']
   const getFinishingOptions: typeof import('../../services/finishingOptions')['getFinishingOptions']
   const getFinishingPrices: typeof import('../../services/finishingPrices')['getFinishingPrices']
@@ -177,7 +179,6 @@ declare global {
   const isVue2: typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/compat/vue-demi')['isVue2']
   const isVue3: typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/compat/vue-demi')['isVue3']
   const isoDateFormat: typeof import('../../utils/filters')['isoDateFormat']
-  const loadFinishingPrices: typeof import('../../utils/finishingPricing')['loadFinishingPrices']
   const loadPayload: typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/composables/payload')['loadPayload']
   const longDateAndTimeFormat: typeof import('../../utils/filters')['longDateAndTimeFormat']
   const longDateFormat: typeof import('../../utils/filters')['longDateFormat']
@@ -251,6 +252,7 @@ declare global {
   const updateAppConfig: typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/config')['updateAppConfig']
   const updateDepartment: typeof import('../../services/departments')['updateDepartment']
   const updateEstimateType: typeof import('../../services/estimateTypes')['updateEstimateType']
+  const updateFinishedArtefactSize: typeof import('../../services/finishedArtefactSizes')['updateFinishedArtefactSize']
   const updateFinishedGood: typeof import('../../services/finishedGoods')['updateFinishedGood']
   const updateFinishingOption: typeof import('../../services/finishingOptions')['updateFinishingOption']
   const updateFormula: typeof import('../../services/formulas')['updateFormula']
@@ -384,7 +386,6 @@ declare module 'vue' {
   interface ComponentCustomProperties {
     readonly LAMINATION_SIZES: UnwrapRef<typeof import('../../utils/finishingPricing')['LAMINATION_SIZES']>
     readonly LAMINATION_TYPES: UnwrapRef<typeof import('../../utils/finishingPricing')['LAMINATION_TYPES']>
-    readonly PRICING_KEY: UnwrapRef<typeof import('../../utils/finishingPricing')['PRICING_KEY']>
     readonly SPOT_TYPES: UnwrapRef<typeof import('../../utils/finishingPricing')['SPOT_TYPES']>
     readonly _currency: UnwrapRef<typeof import('../../utils/filters')['_currency']>
     readonly abortNavigation: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/composables/router')['abortNavigation']>
@@ -411,6 +412,7 @@ declare module 'vue' {
     readonly createDepartment: UnwrapRef<typeof import('../../services/departments')['createDepartment']>
     readonly createError: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/composables/error')['createError']>
     readonly createEstimateType: UnwrapRef<typeof import('../../services/estimateTypes')['createEstimateType']>
+    readonly createFinishedArtefactSize: UnwrapRef<typeof import('../../services/finishedArtefactSizes')['createFinishedArtefactSize']>
     readonly createFinishedGood: UnwrapRef<typeof import('../../services/finishedGoods')['createFinishedGood']>
     readonly createFinishingOption: UnwrapRef<typeof import('../../services/finishingOptions')['createFinishingOption']>
     readonly createFinishingPrice: UnwrapRef<typeof import('../../services/finishingPrices')['createFinishingPrice']>
@@ -453,6 +455,7 @@ declare module 'vue' {
     readonly deleteDepartment: UnwrapRef<typeof import('../../services/departments')['deleteDepartment']>
     readonly deleteEstimate: UnwrapRef<typeof import('../../services/estimates')['deleteEstimate']>
     readonly deleteEstimateType: UnwrapRef<typeof import('../../services/estimateTypes')['deleteEstimateType']>
+    readonly deleteFinishedArtefactSize: UnwrapRef<typeof import('../../services/finishedArtefactSizes')['deleteFinishedArtefactSize']>
     readonly deleteFinishedGood: UnwrapRef<typeof import('../../services/finishedGoods')['deleteFinishedGood']>
     readonly deleteFinishingOption: UnwrapRef<typeof import('../../services/finishingOptions')['deleteFinishingOption']>
     readonly deleteFormula: UnwrapRef<typeof import('../../services/formulas')['deleteFormula']>
@@ -495,6 +498,7 @@ declare module 'vue' {
     readonly getEstimateDetails: UnwrapRef<typeof import('../../services/estimates')['getEstimateDetails']>
     readonly getEstimateStats: UnwrapRef<typeof import('../../services/estimates')['getEstimateStats']>
     readonly getEstimateTypes: UnwrapRef<typeof import('../../services/estimateTypes')['getEstimateTypes']>
+    readonly getFinishedArtefactSizes: UnwrapRef<typeof import('../../services/finishedArtefactSizes')['getFinishedArtefactSizes']>
     readonly getFinishedGoods: UnwrapRef<typeof import('../../services/finishedGoods')['getFinishedGoods']>
     readonly getFinishingOptions: UnwrapRef<typeof import('../../services/finishingOptions')['getFinishingOptions']>
     readonly getFinishingPrices: UnwrapRef<typeof import('../../services/finishingPrices')['getFinishingPrices']>
@@ -558,7 +562,6 @@ declare module 'vue' {
     readonly isVue2: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/compat/vue-demi')['isVue2']>
     readonly isVue3: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/compat/vue-demi')['isVue3']>
     readonly isoDateFormat: UnwrapRef<typeof import('../../utils/filters')['isoDateFormat']>
-    readonly loadFinishingPrices: UnwrapRef<typeof import('../../utils/finishingPricing')['loadFinishingPrices']>
     readonly loadPayload: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/composables/payload')['loadPayload']>
     readonly longDateAndTimeFormat: UnwrapRef<typeof import('../../utils/filters')['longDateAndTimeFormat']>
     readonly longDateFormat: UnwrapRef<typeof import('../../utils/filters')['longDateFormat']>
@@ -632,6 +635,7 @@ declare module 'vue' {
     readonly updateAppConfig: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/config')['updateAppConfig']>
     readonly updateDepartment: UnwrapRef<typeof import('../../services/departments')['updateDepartment']>
     readonly updateEstimateType: UnwrapRef<typeof import('../../services/estimateTypes')['updateEstimateType']>
+    readonly updateFinishedArtefactSize: UnwrapRef<typeof import('../../services/finishedArtefactSizes')['updateFinishedArtefactSize']>
     readonly updateFinishedGood: UnwrapRef<typeof import('../../services/finishedGoods')['updateFinishedGood']>
     readonly updateFinishingOption: UnwrapRef<typeof import('../../services/finishingOptions')['updateFinishingOption']>
     readonly updateFormula: UnwrapRef<typeof import('../../services/formulas')['updateFormula']>

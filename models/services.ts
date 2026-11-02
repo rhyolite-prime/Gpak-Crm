@@ -65,6 +65,7 @@ export interface FinishingPrice extends BaseEntityModel {
 
 export interface FinishedArtefactSize extends BaseEntityModel { 
 
+    alias: string; 
     length: number; 
     width: number; 
     unit: string; 
