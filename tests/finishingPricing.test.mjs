@@ -107,3 +107,25 @@ test('new estimate selects the folding band using form job quantity', async () =
   const page = await readFile(new URL('../pages/estimates/new.vue', import.meta.url), 'utf8')
   assert.match(page, /folding:\s*\[qty\.folding,\s*foldingPrice\(Number\(form\.quantity\)\s*\|\|\s*0,\s*prices\)\]/)
 })
+
+test('lamination uses printing cover, selected width and cover paper overs', async () => {
+  const { laminationQuantity, laminationUnitPrice, coverMaterialOvers } = await import('../utils/finishingPricing.ts')
+  const rows = [
+    { id: 'inside', category: 'Paper info', quantity: 100 },
+    { id: 'cover', category: 'Paper info', quantity: 80 },
+    { id: 'inside-overs', category: 'Paper info', isPercentagePlugin: true, percentageTarget: 'inside', quantity: 10 },
+    { id: 'cover-overs', category: 'Paper info', isPercentagePlugin: true, percentageTarget: 'cover', quantity: 8 },
+    { id: 'extra-cover-overs', category: 'Paper info', isPercentagePlugin: true, percentageTarget: 'cover', quantity: 2 },
+  ]
+  assert.equal(coverMaterialOvers(rows, 'bookwork'), 10)
+  assert.equal(coverMaterialOvers(rows, 'labels'), 10)
+  assert.equal(coverMaterialOvers([], 'bookwork'), 0)
+  assert.equal(laminationQuantity(20, coverMaterialOvers(rows, 'bookwork'), 2, 510), 30.6)
+  const prices = defaultFinishingPrices()
+  prices.lamination.matt['510'] = 2.5
+  prices.lamination.gloss['510'] = 0
+  assert.equal(laminationUnitPrice(prices, 'matt', '510'), 2.5)
+  assert.equal(laminationUnitPrice(prices, 'gloss', '510'), 0)
+  assert.equal(laminationUnitPrice(prices, 'matt', '381'), null)
+  assert.equal(laminationUnitPrice(prices, 'unknown', '510'), null)
+})

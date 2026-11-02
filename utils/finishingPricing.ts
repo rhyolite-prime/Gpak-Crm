@@ -48,9 +48,26 @@ export function finishingPricesFromApi(value: unknown): FinishingPrices | null {
     spot: { ...blank.spot, ...data.spot },
   }
 }
+/** Lamination is measured in metres using the printing cover quantity and cover paper overs. */
+export function laminationQuantity(coverQuantity: number, coverOvers: number, outs: number, size: number): number {
+  return (coverQuantity + coverOvers) * outs * size / 1000
+}
+
+export function coverMaterialOvers(rows: { id: string; category: string; isPercentagePlugin?: boolean; percentageTarget?: string; quantity?: number | null }[], templateType: string): number {
+  const paperRows = rows.filter(row => row.category === 'Paper info' && !row.isPercentagePlugin)
+  const cover = paperRows[templateType === 'bookwork' ? 1 : 0]
+  return cover ? rows.filter(row => row.isPercentagePlugin && row.percentageTarget === cover.id)
+    .reduce((sum, row) => sum + (Number(row.quantity) || 0), 0) : 0
+}
+
+export function laminationUnitPrice(prices: FinishingPrices, type: string, size: string): number | null {
+  const price = prices.lamination?.[type]?.[size]
+  return typeof price === 'number' && Number.isFinite(price) && price >= 0 ? price : null
+}
+
 export function bookworkQuantities(pagesInSection: number, jobQuantity: number, pages: number, coverQuantity: number, coverOvers: number, outs: number, size: number, spotOvers: number) {
   const collate = pagesInSection * jobQuantity
-  return { collate, folding: Math.ceil(collate / 1000), perfectBind: pages * jobQuantity, binding: jobQuantity, lamination: (coverQuantity + coverOvers) * outs * size / 1000, spot: jobQuantity + spotOvers }
+  return { collate, folding: Math.ceil(collate / 1000), perfectBind: pages * jobQuantity, binding: jobQuantity, lamination: laminationQuantity(coverQuantity, coverOvers, outs, size), spot: jobQuantity + spotOvers }
 }
 /** Migrate setups and estimate snapshots saved before configurable bands existed. */
 export function getFoldingTiers(prices: Partial<FinishingPrices> & { foldingUpTo1000?: number | null; foldingAbove1000?: number | null }): FoldingTier[] {
