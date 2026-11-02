@@ -232,6 +232,7 @@
 </template>
 
 <script setup lang="ts">
+import { bindingOptions, addOptions, laminateOptions, vanishOptions, spotOptions } from '~/utils/productionFinishingOptions';
 import FinishingOptions from '~/components/ui/FinishingOptions.vue';
 import { serializeFinishingOptions, parseSurfaceFinish } from '~/utils/finishingOptions';
  
@@ -252,49 +253,6 @@ const isSubmitting = ref(false);
 const requestNumber = ref('');
 const rawMaterialsList = ref<RawMaterial[]>([]);
 const estimateTypeList = ref<EstimateType[]>([]);
-
-// ── Static finishing options ──────────────────────────────────────────────────
-const bindingOptions = [
-  { id: 'saddle-stitch', name: 'Saddle stitch' },
-  { id: 'perfect-bind', name: 'Perfect bind' },
-  { id: 'case-bind', name: 'Case bind' },
-  { id: 'wire-o', name: 'Wire O' },
-  { id: 'spiral-bind', name: 'Spiral bind' },
-  { id: 'side-stab', name: 'Side Stab' },
-  { id: 'padding', name: 'Padding' },
-];
-
-const addOptions = [
-  { id: 'die-cutting', name: 'Die cutting' },
-  { id: 'embossing', name: 'Embossing' },
-  { id: 'folding', name: 'Folding' },
-  { id: 'numbering', name: 'Numbering' },
-  { id: 'perforating', name: 'Perforating' },
-  { id: 'punching', name: 'Punching' },
-  { id: 'cutting', name: 'Cutting' },
-  { id: 'sewing', name: 'Sewing' },
-  { id: 'fold-glue', name: 'Fold/Glue' },
-  { id: 'glue', name: 'Glue' },
-];
-
-const laminateOptions = [
-  { id: 'gloss', name: 'Gloss' },
-  { id: 'matt', name: 'Matt' },
-  { id: 'soft-touch', name: 'Soft Touch' },
-  { id: 'saudy', name: 'Saudy' },
-];
-
-const vanishOptions = [
-  { id: 'uv-varnish', name: 'UV Vanish' },
-  { id: 'waterbase-varnish', name: 'Waterbase Vanish' },
-  { id: 'oil-varnish', name: 'Oil Vanish' },
-];
-
-const spotOptions = [
-  { id: '3d-matt', name: '3D Matt' },
-  { id: '3d-gloss', name: '3D Gloss' },
-  { id: '3d-pattern', name: '3D Pattern' },
-];
 
 // ── Form state ────────────────────────────────────────────────────────────────
 const form = reactive({

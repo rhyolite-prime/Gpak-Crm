@@ -275,7 +275,7 @@
                 <template v-else>
                   <tr v-for="row in getRowsByCategory(category)" :key="row.id" class="hover:bg-gray-50">
                     <td class="px-4 py-2">
-                      <input v-model="row.description" :readonly="!!row.finishingKind" type="text" class="w-full border-transparent bg-transparent rounded p-1 focus:border-red-500 focus:ring-red-500 text-sm" placeholder="Item description" />
+                      <input v-model="row.description" :readonly="!!row.finishingKind || !!row.isFinishingOption" type="text" class="w-full border-transparent bg-transparent rounded p-1 focus:border-red-500 focus:ring-red-500 text-sm" placeholder="Item description" />
                       <label v-if="row.finishingKind === 'spot'" class="mt-1 flex items-center gap-2 text-xs text-gray-600">Job overs <input v-model.number="finishingSelection.spotOvers" type="number" min="0" step="1" aria-label="Spot finish job overs" class="w-24 border border-gray-300 px-2 py-1" /></label>
                     </td>
                     <td class="px-4 py-2">
@@ -296,7 +296,22 @@
                   </tr>
                   <tr>
                     <td colspan="5" class="px-6 py-2">
-                      <button type="button" @click="addTableRow(category)" class="text-xs text-red-600 hover:text-red-800 font-medium flex items-center">
+                      <template v-if="category === 'Finishing'">
+                        <button v-if="!showFinishingPicker" type="button" class="text-xs font-medium text-red-600 hover:text-red-800" @click="showFinishingPicker = true">+ Add item</button>
+                        <div v-else class="flex flex-wrap items-end gap-2">
+                          <label class="flex flex-col gap-1 text-xs font-semibold text-gray-600">Finishing option
+                            <select v-model="selectedFinishingOption" aria-label="Choose finishing option" class="min-w-56 border border-gray-300 bg-white px-3 py-2 text-sm">
+                              <option value="">Select an option</option>
+                              <optgroup v-for="group in finishingOptionGroups" :key="group.id" :label="group.name">
+                                <option v-for="option in group.options" :key="option.id" :value="`${group.id}:${option.id}`">{{ option.name }}</option>
+                              </optgroup>
+                            </select>
+                          </label>
+                          <button type="button" :disabled="!selectedFinishingOption" class="btn-primary" @click="addFinishingOption">Add</button>
+                          <button type="button" class="btn-secondary" @click="showFinishingPicker = false; selectedFinishingOption = ''">Cancel</button>
+                        </div>
+                      </template>
+                      <button v-else type="button" @click="addTableRow(category)" class="text-xs text-red-600 hover:text-red-800 font-medium flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                         Add item
                       </button>
@@ -369,6 +384,7 @@
 
 <script setup lang="ts">
 import { useRoute, useRouter, useNuxtApp } from '#app';
+import { finishingOptionGroups, findFinishingOption } from '~/utils/productionFinishingOptions';
 import { emptyFinishingPrices, finishingPricesFromApi, bookworkQuantities, foldingPrice, toFinishingPricesPayload, LAMINATION_TYPES, LAMINATION_SIZES, SPOT_TYPES } from '~/utils/finishingPricing';
 import { getProductionRequestDetails } from '~/services/productionRequests';
 import { getRawMaterials } from '~/services/rawMaterials';
@@ -431,6 +447,7 @@ interface TableRow {
   computedTotal?: number;
   quantityManuallyEdited?: boolean;
   finishingKind?: string;
+  isFinishingOption?: boolean;
 }
 
 interface SummaryField {
@@ -942,6 +959,15 @@ const unitCost = computed(() => {
 });
 
 // ── Actions ───────────────────────────────────────────────────────────────────
+const showFinishingPicker = ref(false);
+const selectedFinishingOption = ref('');
+const addFinishingOption = () => {
+  const option = findFinishingOption(selectedFinishingOption.value);
+  if (!option) return;
+  form.tableRows.push({ id: generateId(), category: 'Finishing', description: `${option.group}: ${option.name}`, quantity: null, unitPrice: null, isFinishingOption: true });
+  selectedFinishingOption.value = '';
+  showFinishingPicker.value = false;
+};
 const addTableRow = (category: string) => {
   const newRow: TableRow = { id: generateId(), description: '', quantity: null, unitPrice: null, category };
   if (category === 'Paper info') {
