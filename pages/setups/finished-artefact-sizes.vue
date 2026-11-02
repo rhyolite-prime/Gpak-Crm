@@ -15,7 +15,7 @@ const isLoading = ref(true)
 const loadError = ref('')
 const showForm = ref(false)
 const editingId = ref<string | null>(null)
-const form = reactive<{ alias: string; length: number | null; width: number | null; unit: string }>({ alias: '', length: null, width: null, unit: '' })
+const form = reactive<{ alias: string; length: number | null; width: number | null; unit: string }>({ alias: '', length: null, width: null, unit: 'mm' })
 const formError = ref('')
 const isSaving = ref(false)
 const deleteTarget = ref<FinishedArtefactSize | null>(null)
@@ -66,7 +66,7 @@ const changePage = (page: number) => {
 }
 const openCreate = () => {
   editingId.value = null
-  Object.assign(form, { alias: '', length: null, width: null, unit: '' })
+  Object.assign(form, { alias: '', length: null, width: null, unit: 'mm' })
   formError.value = ''
   showForm.value = true
 }
@@ -80,8 +80,8 @@ const closeForm = () => { if (!isSaving.value) showForm.value = false }
 const save = async () => {
   if (isSaving.value) return
   formError.value = ''
-  if (typeof form.length !== 'number' || !Number.isFinite(form.length) || form.length <= 0 || typeof form.width !== 'number' || !Number.isFinite(form.width) || form.width <= 0 || !form.unit.trim()) {
-    formError.value = 'Enter a length and width greater than zero and a unit of measurement.'
+  if (typeof form.length !== 'number' || !Number.isFinite(form.length) || form.length <= 0 || typeof form.width !== 'number' || !Number.isFinite(form.width) || form.width <= 0 || !['mm', 'cm'].includes(form.unit)) {
+    formError.value = 'Enter a length and width greater than zero and select mm or cm.'
     return
   }
   isSaving.value = true
@@ -132,7 +132,7 @@ const remove = async () => {
       <div v-if="!loadError && totalPages > 1" class="flex items-center justify-between border-t border-gray-100 px-5 py-4 text-xs text-gray-500"><span>Page {{ filters.pageNo }} of {{ totalPages }}</span><div class="flex gap-2"><button type="button" :disabled="isLoading || filters.pageNo <= 1" class="btn-secondary" @click="changePage(filters.pageNo - 1)">Previous</button><button type="button" :disabled="isLoading || filters.pageNo >= totalPages" class="btn-secondary" @click="changePage(filters.pageNo + 1)">Next</button></div></div>
     </section>
 
-    <div v-if="showForm" class="modal-overlay" @click.self="closeForm"><div class="modal-content max-w-lg" role="dialog" aria-modal="true" aria-labelledby="size-form-title"><div class="flex items-center justify-between border-b border-gray-100 p-6"><div><h2 id="size-form-title" class="text-lg font-bold">{{ editingId ? 'Edit size' : 'Add finished size' }}</h2><p class="mt-1 text-xs text-gray-500">Enter the finished dimensions of the artefact.</p></div><button type="button" aria-label="Close" :disabled="isSaving" class="text-gray-400 hover:text-gray-700" @click="closeForm"><X class="h-5 w-5" /></button></div><form class="space-y-4 p-6" @submit.prevent="save"><label class="block space-y-1 text-sm font-medium text-gray-700"><span>Alias</span><input v-model="form.alias" type="text" class="w-full border border-gray-300 px-3 py-2" placeholder="e.g. A5" /></label><div class="grid gap-4 sm:grid-cols-2"><label class="space-y-1 text-sm font-medium text-gray-700"><span>Length</span><input v-model.number="form.length" type="number" min="0.000001" step="any" required class="w-full border border-gray-300 px-3 py-2" placeholder="e.g. 210" /></label><label class="space-y-1 text-sm font-medium text-gray-700"><span>Width</span><input v-model.number="form.width" type="number" min="0.000001" step="any" required class="w-full border border-gray-300 px-3 py-2" placeholder="e.g. 148" /></label></div><label class="block space-y-1 text-sm font-medium text-gray-700"><span>Unit</span><input v-model="form.unit" type="text" required class="w-full border border-gray-300 px-3 py-2" placeholder="e.g. mm" /></label><p v-if="formError" role="alert" class="text-sm text-red-700">{{ formError }}</p><div class="flex justify-end gap-3 pt-3"><button type="button" class="btn-secondary" :disabled="isSaving" @click="closeForm">Cancel</button><button type="submit" class="btn-primary" :disabled="isSaving">{{ isSaving ? 'Saving…' : 'Save size' }}</button></div></form></div></div>
+    <div v-if="showForm" class="modal-overlay" @click.self="closeForm"><div class="modal-content max-w-lg" role="dialog" aria-modal="true" aria-labelledby="size-form-title"><div class="flex items-center justify-between border-b border-gray-100 p-6"><div><h2 id="size-form-title" class="text-lg font-bold">{{ editingId ? 'Edit size' : 'Add finished size' }}</h2><p class="mt-1 text-xs text-gray-500">Enter the finished dimensions of the artefact.</p></div><button type="button" aria-label="Close" :disabled="isSaving" class="text-gray-400 hover:text-gray-700" @click="closeForm"><X class="h-5 w-5" /></button></div><form class="space-y-4 p-6" @submit.prevent="save"><label class="block space-y-1 text-sm font-medium text-gray-700"><span>Alias</span><input v-model="form.alias" type="text" class="w-full border border-gray-300 px-3 py-2" placeholder="e.g. A5" /></label><div class="grid gap-4 sm:grid-cols-2"><label class="space-y-1 text-sm font-medium text-gray-700"><span>Length</span><input v-model.number="form.length" type="number" min="0.000001" step="any" required class="w-full border border-gray-300 px-3 py-2" placeholder="e.g. 210" /></label><label class="space-y-1 text-sm font-medium text-gray-700"><span>Width</span><input v-model.number="form.width" type="number" min="0.000001" step="any" required class="w-full border border-gray-300 px-3 py-2" placeholder="e.g. 148" /></label></div><label class="block space-y-1 text-sm font-medium text-gray-700"><span>Unit</span><select v-model="form.unit" required class="w-full border border-gray-300 bg-white px-3 py-2"><option v-if="form.unit && !['mm', 'cm'].includes(form.unit)" :value="form.unit" disabled>{{ form.unit }} (select mm or cm)</option><option value="mm">mm</option><option value="cm">cm</option></select></label><p v-if="formError" role="alert" class="text-sm text-red-700">{{ formError }}</p><div class="flex justify-end gap-3 pt-3"><button type="button" class="btn-secondary" :disabled="isSaving" @click="closeForm">Cancel</button><button type="submit" class="btn-primary" :disabled="isSaving">{{ isSaving ? 'Saving…' : 'Save size' }}</button></div></form></div></div>
     <div v-if="deleteTarget" class="modal-overlay" @click.self="closeDelete"><div class="modal-content max-w-md p-6" role="alertdialog" aria-modal="true" aria-labelledby="delete-size-title"><h2 id="delete-size-title" class="text-lg font-bold text-gray-900">Delete size?</h2><p class="mt-3 text-sm text-gray-600">Are you sure you want to delete <strong>{{ deleteTarget.length }} × {{ deleteTarget.width }} {{ deleteTarget.unit }}</strong>? This cannot be undone.</p><p v-if="deleteError" role="alert" class="mt-3 text-sm text-red-700">{{ deleteError }}</p><div class="mt-6 flex justify-end gap-3"><button type="button" class="btn-secondary" :disabled="isDeleting" @click="closeDelete">Cancel</button><button type="button" class="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700" :disabled="isDeleting" @click="remove">{{ isDeleting ? 'Deleting…' : 'Delete size' }}</button></div></div></div>
   </div>
 </template>
