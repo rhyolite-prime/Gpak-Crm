@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { ESTIMATE_SNAPSHOT_KEY, serializeEstimateSnapshot, readEstimateSnapshot, isNewEstimate } from '../utils/estimateSnapshot.ts'
+import { ESTIMATE_SNAPSHOT_KEY, buildEstimateSnapshot, readEstimateSnapshot, isNewEstimate, readComplexVariable } from '../utils/estimateSnapshot.ts'
 
 test('snapshot round-trips complete form values and row relationships without losing null or zero', () => {
   const form = {
@@ -17,9 +17,13 @@ test('snapshot round-trips complete form values and row relationships without lo
   const selection = { binding: 'perfect-bind', surface: 'lamination', laminateType: 'gloss', laminateSize: '825.5', spotType: '3d-matt', spotOvers: 0 }
   const prices = { foldingTiers: [{ minQuantity: 100, maxQuantity: null, price: 20 }], lamination: { gloss: { '825.5': 0 } } }
   const request = { requestNumber: 'PR-1', customerName: 'Client' }
-  const value = serializeEstimateSnapshot(form, selection, prices, request, 'request-1')
+  const value = buildEstimateSnapshot(form, selection, prices, request, 'request-1')
   const restored = readEstimateSnapshot([{ systemName: ESTIMATE_SNAPSHOT_KEY, value }])
   assert.deepEqual(restored, { version: 1, form, finishingSelection: selection, finishingPrices: prices, productionRequest: request, productionRequestId: 'request-1' })
+  assert.equal(typeof value, 'object')
+  assert.deepEqual(readEstimateSnapshot([{ systemName: ESTIMATE_SNAPSHOT_KEY, value: JSON.stringify(value) }]), restored)
+  assert.deepEqual(readComplexVariable(form.tableRows), form.tableRows)
+  assert.deepEqual(readComplexVariable(JSON.stringify(form.tableRows)), form.tableRows)
   assert.equal(isNewEstimate([{ systemName: ESTIMATE_SNAPSHOT_KEY, value }]), true)
   assert.equal(isNewEstimate([{ systemName: 'estimateRows', value: '[]' }]), true)
   assert.equal(isNewEstimate([{ systemName: 'unrelated', value: '' }]), false)
@@ -30,4 +34,15 @@ test('missing snapshots permit legacy fallback but corrupt, incomplete or newer 
   assert.throws(() => readEstimateSnapshot([{ systemName: ESTIMATE_SNAPSHOT_KEY, value: '{' }]), /invalid or truncated/)
   assert.throws(() => readEstimateSnapshot([{ systemName: ESTIMATE_SNAPSHOT_KEY, value: '{"version":2}' }]), /not supported/)
   assert.throws(() => readEstimateSnapshot([{ systemName: ESTIMATE_SNAPSHOT_KEY, value: '{"version":1}' }]), /incomplete/)
+})
+
+
+test('estimate save passes native complex values instead of JSON strings', async () => {
+  const { readFile } = await import('node:fs/promises')
+  const page = await readFile(new URL('../pages/estimates/new.vue', import.meta.url), 'utf8')
+  const variables = page.slice(page.indexOf('const headerVars = ['), page.indexOf('// ── Map tableRows'))
+  assert.doesNotMatch(variables, /JSON\.stringify/)
+  assert.match(variables, /'summaries',\s*form\.summaries/)
+  assert.match(variables, /'estimateRows',\s*form\.tableRows/)
+  assert.match(variables, /ESTIMATE_SNAPSHOT_KEY, buildEstimateSnapshot\(/)
 })
