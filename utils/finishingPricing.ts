@@ -8,7 +8,6 @@ export type FinishingPrices = {
 export const LAMINATION_TYPES = ['gloss', 'matt', 'soft-touch', 'saudy'] as const
 export const LAMINATION_SIZES = ['381', '460', '510', '640', '740'] as const
 export const SPOT_TYPES = ['3d-matt', '3d-gloss', '3d-pattern'] as const
-export const PRICING_KEY = 'gpak.finishing-prices.v1'
 export function defaultFinishingPrices(): FinishingPrices {
   return {
     collate: 0.075, foldingTiers: [{ minQuantity: 100, maxQuantity: 1000, price: 20 }, { minQuantity: 1001, maxQuantity: null, price: 15 }], perfectBind: null, saddleStitch: 0.004, caseBind: 0.4,
@@ -48,15 +47,6 @@ export function finishingPricesFromApi(value: unknown): FinishingPrices | null {
     lamination: Object.fromEntries(LAMINATION_TYPES.map(type => [type, { ...blank.lamination[type], ...data.lamination?.[type] }])),
     spot: { ...blank.spot, ...data.spot },
   }
-}
-export function loadFinishingPrices(): FinishingPrices {
-  const defaults = defaultFinishingPrices()
-  if (typeof localStorage === 'undefined') return defaults
-  try {
-    const saved = JSON.parse(localStorage.getItem(PRICING_KEY) || 'null')
-    if (!saved || typeof saved !== 'object') return defaults
-    return toFinishingPricesPayload(saved)
-  } catch { return defaults }
 }
 export function bookworkQuantities(pagesInSection: number, jobQuantity: number, pages: number, coverQuantity: number, coverOvers: number, outs: number, size: number, spotOvers: number) {
   const collate = pagesInSection * jobQuantity

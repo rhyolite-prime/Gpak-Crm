@@ -13,7 +13,7 @@ test('service retrieves the single setup and sends create requests', async () =>
     assert.deepEqual(await getFinishingPrices(), setup)
     assert.equal(await createFinishingPrice(setup), true)
     assert.deepEqual(calls, [
-      { path: 'FinishingOptionPrice/ListAll', options: undefined },
+      { path: 'FinishingOptionPrice/ListAll', options: { query: {} } },
       { path: 'FinishingOptionPrice/create', options: { method: 'post', body: setup } },
     ])
   } finally { delete globalThis.httpClient }

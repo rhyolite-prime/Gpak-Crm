@@ -1,6 +1,6 @@
 # Finishing prices: proposed save request
 
-`buildFinishingPricesRequest` in `utils/finishingPricing.ts` constructs a full-replacement request for the authenticated tenant. The API should save all records atomically and scope them to the authenticated tenant; the client does not supply a tenant ID. No endpoint for these prices currently exists in this repository, so the setup page still saves locally and does **not** send this request.
+`buildFinishingPricesRequest` in `utils/finishingPricing.ts` constructs a full-replacement request for the authenticated tenant. The API should save all records atomically and scope them to the authenticated tenant; the client does not supply a tenant ID. The setup page sends its current setup object through `createFinishingPrice` and loads the saved object through `getFinishingPrices`. The record-based full-replacement payload described below is a proposed contract, not the shape currently sent by the page.
 
 ```json
 {
@@ -20,10 +20,8 @@
 
 The example is abbreviated: the actual builder sends all four lamination types at all five widths, all three spot finishes, and the configured folding bands (29 records with the default two bands). `unitPrice: null` means not configured; `0` is a valid configured price. For folding, bounds are inclusive and a null maximum is unbounded. Bands are configurable, must not overlap, and may have gaps. Unmatched quantities are unpriced. The folding price is a flat charge for the entire job, selected by the band containing the total number of pieces; it is not multiplied by the number of batches. For example, with the default bands, 1,001 pieces cost GHS 15 in total. When saving an estimate line, the flat charge is divided by the displayed batch quantity to preserve the existing quantity-times-unit-price contract; the estimate snapshot retains the actual flat price. Other prices use the unit of their respective calculation.
 
-Before connecting a backend, agree on the endpoint, HTTP method, response/error format, and exact numeric precision. The backend must validate nonnegative finite prices and reject duplicate keys `(category, option, sizeMm, minQuantity, maxQuantity)` and overlapping tiers. It must support fetching the same setup so all users and devices see saved prices. The estimate page currently reads the browser-local setup; adding a POST alone would not make it use database prices.
+Before connecting a backend, agree on the endpoint, HTTP method, response/error format, and exact numeric precision. The backend must validate nonnegative finite prices and reject duplicate keys `(category, option, sizeMm, minQuantity, maxQuantity)` and overlapping tiers. The server must scope the setup to the authenticated tenant and return the same setup so users and devices see saved prices. The estimate page loads prices from the API and retains a snapshot in saved estimates.
 
-## Proposed record CRUD service
+## Current setup service
 
-`services/finishingPrices.ts` provides individual record CRUD methods, following the naming and `BaseApiResponse` conventions of the existing setup services. It assumes `finishingprice/getall`, `finishingprice/getdetails`, `finishingprice/create`, `finishingprice/update`, and `finishingprice/delete` routes, with POST for create/update and DELETE for delete. These routes and their response shapes have **not** been verified against a backend. Each create/update request contains one price record and `currency`; update also includes `id`. List responses are assumed to be paginated, and details include the record `id` and `currency`. The service is not connected to the setup page or estimate page.
-
-The individual CRUD methods do not implement the atomic full-replacement request described above. A bulk endpoint (or another transactional backend mechanism) is still needed to save the complete setup atomically, along with a database-backed load path for the setup and estimates.
+`services/finishingPrices.ts` calls `FinishingOptionPrice/ListAll` for a single setup and `FinishingOptionPrice/create` to save one. The setup and estimate pages use the API, not browser storage. No update or delete endpoint is defined in the current service; saving uses the create endpoint. The actual backend contract should be verified independently of the proposed record payload above.

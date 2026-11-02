@@ -1,9 +1,10 @@
 import type { BaseApiResponse, FinishingPrice } from '~/models'
 
 
-export async function getFinishingPrices(query: object) {
+export async function getFinishingPrices(query: object = {}) {
  
-  const response = await httpClient<BaseApiResponse<FinishingPrice>>('FinishingOptionPrice/ListAll', { query });
+  const response = await httpClient<BaseApiResponse<FinishingPrice | null>>('FinishingOptionPrice/ListAll', { query });
+  if (response.success === false) throw new Error(response.error?.message || 'Unable to load finishing prices.')
   return response.result;
 }
 
