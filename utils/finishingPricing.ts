@@ -19,7 +19,7 @@ export function defaultFinishingPrices(): FinishingPrices {
 export function emptyFinishingPrices(): FinishingPrices {
   return {
     collate: null, foldingTiers: [], perfectBind: null, saddleStitch: null, caseBind: null,
-    lamination: Object.fromEntries(LAMINATION_TYPES.map(type => [type, Object.fromEntries(LAMINATION_SIZES.map(size => [size, null]))])),
+    lamination: Object.fromEntries(LAMINATION_TYPES.map(type => [type, {}])),
     spot: Object.fromEntries(SPOT_TYPES.map(type => [type, null])),
   }
 }
@@ -48,6 +48,34 @@ export function finishingPricesFromApi(value: unknown): FinishingPrices | null {
     spot: { ...blank.spot, ...data.spot },
   }
 }
+export type LaminationSizeRow = { size: number | string; price: number | string | null }
+
+/** Transform editable rows to the existing type-to-width-to-price API shape. */
+export function laminationFromRows(rows: Record<string, LaminationSizeRow[]>): FinishingPrices['lamination'] {
+  return Object.fromEntries(LAMINATION_TYPES.map(type => {
+    const sizes: Record<string, number | null> = {}
+    for (const row of rows[type] ?? []) {
+      const width = Number(row.size)
+      if (row.size === '' || !Number.isFinite(width) || width <= 0) throw new Error(`${type}: enter a positive size in millimetres.`)
+      const key = String(width)
+      if (Object.hasOwn(sizes, key)) throw new Error(`${type}: duplicate size ${key} mm.`)
+      const value = row.price
+      if (value === '' || value == null) sizes[key] = null
+      else if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) throw new Error(`${type}: prices must be non-negative numbers or blank.`)
+      else sizes[key] = value
+    }
+    return [type, sizes]
+  }))
+}
+
+export function laminationRows(prices: FinishingPrices): Record<string, LaminationSizeRow[]> {
+  return Object.fromEntries(LAMINATION_TYPES.map(type => [type, Object.entries(prices.lamination?.[type] ?? {}).map(([size, price]) => ({ size, price }))]))
+}
+
+export function laminationSizes(prices: FinishingPrices, type: string): string[] {
+  return Object.keys(prices.lamination?.[type] ?? {}).filter(size => Number.isFinite(Number(size)) && Number(size) > 0).sort((a, b) => Number(a) - Number(b))
+}
+
 /** Lamination is measured in metres using the printing cover quantity and cover paper overs. */
 export function laminationQuantity(coverQuantity: number, coverOvers: number, outs: number, size: number): number {
   return (coverQuantity + coverOvers) * outs * size / 1000
@@ -88,7 +116,7 @@ export function toFinishingPricesPayload(prices: Partial<FinishingPrices> & { fo
     perfectBind: prices.perfectBind === undefined ? defaults.perfectBind : prices.perfectBind,
     saddleStitch: prices.saddleStitch === undefined ? defaults.saddleStitch : prices.saddleStitch,
     caseBind: prices.caseBind === undefined ? defaults.caseBind : prices.caseBind,
-    lamination: Object.fromEntries(LAMINATION_TYPES.map(type => [type, { ...defaults.lamination[type], ...prices.lamination?.[type] }])),
+    lamination: Object.fromEntries(LAMINATION_TYPES.map(type => [type, { ...prices.lamination?.[type] }])),
     spot: { ...defaults.spot, ...prices.spot },
   }
 }
@@ -142,7 +170,10 @@ export function buildFinishingPricesRequest(prices: FinishingPrices): FinishingP
       record('binding', 'perfect-bind', prices.perfectBind),
       record('binding', 'saddle-stitch', prices.saddleStitch),
       record('binding', 'case-bind', prices.caseBind),
-      ...LAMINATION_TYPES.flatMap(type => LAMINATION_SIZES.map(size => record('lamination', type, prices.lamination?.[type]?.[size], Number(size)))),
+      ...LAMINATION_TYPES.flatMap(type => Object.entries(prices.lamination?.[type] ?? {}).map(([size, value]) => {
+        if (!Number.isFinite(Number(size)) || Number(size) <= 0) throw new Error('Lamination sizes must be positive numbers in millimetres.')
+        return record('lamination', type, value, Number(size))
+      })),
       ...SPOT_TYPES.map(type => record('spot-finish', type, prices.spot?.[type])),
     ],
   }

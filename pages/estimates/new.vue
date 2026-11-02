@@ -280,7 +280,15 @@
                         Size
                         <select :value="row.laminateSize || ''" @change="onLaminationSizeChange(row, ($event.target as HTMLSelectElement).value)" aria-label="Lamination size" class="border border-gray-200 rounded px-2 py-1 text-xs text-gray-600 bg-gray-50 focus:ring-red-400 focus:border-red-400">
                           <option value="">— Size —</option>
-                          <option v-for="size in LAMINATION_SIZES" :key="size" :value="size">{{ size }} mm</option>
+                          <option v-if="row.laminateSize && !laminationSizesForRow(row).includes(row.laminateSize)" :value="row.laminateSize">{{ row.laminateSize }} mm (not configured)</option>
+                          <option v-for="size in laminationSizesForRow(row)" :key="size" :value="size">{{ size }} mm{{ laminationUnitPrice(finishingPrices, findLaminationOption(row.finishingOptionValue, row.description)?.value.slice('lamination:'.length) || '', size) == null ? ' (price not set)' : '' }}</option>
+                        </select>
+                      </label>
+                      <label v-if="row.finishingKind === 'lamination'" class="mt-1 flex items-center gap-2 text-xs text-gray-600">Size
+                        <select v-model="finishingSelection.laminateSize" aria-label="Lamination size" class="border border-gray-200 rounded px-2 py-1 text-xs text-gray-600 bg-gray-50 focus:ring-red-400 focus:border-red-400">
+                          <option value="">— Size —</option>
+                          <option v-if="finishingSelection.laminateSize && !laminationSizes(finishingPrices, finishingSelection.laminateType).includes(finishingSelection.laminateSize)" :value="finishingSelection.laminateSize">{{ finishingSelection.laminateSize }} mm (not configured)</option>
+                          <option v-for="size in laminationSizes(finishingPrices, finishingSelection.laminateType)" :key="size" :value="size">{{ size }} mm{{ laminationUnitPrice(finishingPrices, finishingSelection.laminateType, size) == null ? ' (price not set)' : '' }}</option>
                         </select>
                       </label>
                       <label v-if="row.finishingKind === 'spot'" class="mt-1 flex items-center gap-2 text-xs text-gray-600">Job overs <input v-model.number="finishingSelection.spotOvers" type="number" min="0" step="1" aria-label="Spot finish job overs" class="w-24 border border-gray-300 px-2 py-1" /></label>
@@ -387,7 +395,7 @@
 <script setup lang="ts">
 import { useRoute, useRouter, useNuxtApp } from '#app';
 import { finishingOptionGroups, findFinishingOption, findLaminationOption, laminationDescription } from '~/utils/productionFinishingOptions';
-import { emptyFinishingPrices, finishingPricesFromApi, bookworkQuantities, foldingPrice, laminationQuantity, laminationUnitPrice, coverMaterialOvers, toFinishingPricesPayload, LAMINATION_TYPES, LAMINATION_SIZES, SPOT_TYPES } from '~/utils/finishingPricing';
+import { emptyFinishingPrices, finishingPricesFromApi, bookworkQuantities, foldingPrice, laminationQuantity, laminationUnitPrice, coverMaterialOvers, toFinishingPricesPayload, laminationSizes, LAMINATION_TYPES, SPOT_TYPES } from '~/utils/finishingPricing';
 import { getProductionRequestDetails } from '~/services/productionRequests';
 import { getRawMaterials } from '~/services/rawMaterials';
 import { getFinishedArtefactSizes } from '~/services/finishedArtefactSizes';
@@ -872,7 +880,7 @@ const loadProductionRequest = async (id: string) => {
         const binding = finish.Binding ?? finish.binding ?? details.binding ?? '';
         if (['perfect-bind', 'saddle-stitch', 'case-bind'].includes(binding)) finishingSelection.binding = binding;
         const surface = finish.SurfaceFinish ?? finish.surfaceFinish ?? '';
-        if (surface.startsWith('lamination:')) { finishingSelection.surface = 'lamination'; const type = surface.split(':')[1]; if (LAMINATION_TYPES.includes(type as any)) finishingSelection.laminateType = type; }
+        if (surface.startsWith('lamination:')) { finishingSelection.surface = 'lamination'; const type = surface.split(':')[1]; if (LAMINATION_TYPES.includes(type as any)) finishingSelection.laminateType = type; finishingSelection.laminateSize = laminationSizes(finishingPrices.value, finishingSelection.laminateType)[0] ?? ''; }
         if (surface.startsWith('spot-finish:')) { finishingSelection.surface = 'spot'; const type = surface.split(':')[1]; if (SPOT_TYPES.includes(type as any)) finishingSelection.spotType = type; }
       }
 
@@ -993,6 +1001,10 @@ const addFinishingOption = () => {
   form.tableRows.push({ id: generateId(), category: 'Finishing', description: `${option.group}: ${option.name}`, quantity: null, unitPrice: null, isFinishingOption: true, finishingOptionValue: option.value, laminateSize: '' });
   selectedFinishingOption.value = '';
   showFinishingPicker.value = false;
+};
+const laminationSizesForRow = (row: TableRow) => {
+  const option = findLaminationOption(row.finishingOptionValue, row.description);
+  return option ? laminationSizes(finishingPrices.value, option.value.slice('lamination:'.length)) : [];
 };
 const onLaminationSizeChange = (row: TableRow, size: string) => {
   const option = findLaminationOption(row.finishingOptionValue, row.description);

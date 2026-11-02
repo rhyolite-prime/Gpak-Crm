@@ -1,27 +1,35 @@
-# Finishing prices: proposed save request
+# Finishing price setup API
 
-`buildFinishingPricesRequest` in `utils/finishingPricing.ts` constructs a full-replacement request for the authenticated tenant. The API should save all records atomically and scope them to the authenticated tenant; the client does not supply a tenant ID. The setup page sends its current setup object through `createFinishingPrice` and loads the saved object through `getFinishingPrices`. The record-based full-replacement payload described below is a proposed contract, not the shape currently sent by the page.
+The frontend currently calls `GET FinishingOptionPrice/ListAll` for one setup and `POST FinishingOptionPrice/create` to save a setup. The POST body is the **setup object below**, not the record-based format produced by the internal validation helper. No update or delete endpoint is defined by this frontend; the current create endpoint must return a successful response and the list endpoint must subsequently expose the saved setup. Confirm the backend's create/versioning behavior before deployment.
+
+## Dynamic lamination sizes
+
+Keep `lamination` as a JSON object keyed first by the existing type (`gloss`, `matt`, `soft-touch`, `saudy`) and then by the width in millimetres as a numeric string. Widths are independently configurable per type. Example POST body (other fields abbreviated):
 
 ```json
 {
-  "currency": "GHS",
-  "prices": [
-    { "category": "collate", "option": "collate", "sizeMm": null, "minQuantity": null, "maxQuantity": null, "unitPrice": 0.075 },
-    { "category": "folding", "option": "folding", "sizeMm": null, "minQuantity": 100, "maxQuantity": 1000, "unitPrice": 20 },
-    { "category": "folding", "option": "folding", "sizeMm": null, "minQuantity": 1001, "maxQuantity": null, "unitPrice": 15 },
-    { "category": "binding", "option": "perfect-bind", "sizeMm": null, "minQuantity": null, "maxQuantity": null, "unitPrice": null },
-    { "category": "binding", "option": "saddle-stitch", "sizeMm": null, "minQuantity": null, "maxQuantity": null, "unitPrice": 0.004 },
-    { "category": "binding", "option": "case-bind", "sizeMm": null, "minQuantity": null, "maxQuantity": null, "unitPrice": 0.4 },
-    { "category": "lamination", "option": "gloss", "sizeMm": 460, "minQuantity": null, "maxQuantity": null, "unitPrice": 1.3 },
-    { "category": "spot-finish", "option": "3d-matt", "sizeMm": null, "minQuantity": null, "maxQuantity": null, "unitPrice": null }
-  ]
+  "collate": 1.3,
+  "perfectBind": 2.2,
+  "saddleStitch": 2,
+  "caseBind": 2,
+  "foldingTiers": [{ "minQuantity": 100, "maxQuantity": 1000, "price": 20 }],
+  "lamination": {
+    "gloss": { "460": 2.3, "825.5": 3.1 },
+    "matt": { "510": 2.5 },
+    "soft-touch": {},
+    "saudy": { "640": null }
+  },
+  "spot": { "3d-matt": 2, "3d-gloss": 2.8, "3d-pattern": 2.9 }
 }
 ```
 
-The example is abbreviated: the actual builder sends all four lamination types at all five widths, all three spot finishes, and the configured folding bands (29 records with the default two bands). `unitPrice: null` means not configured; `0` is a valid configured price. For folding, bounds are inclusive and a null maximum is unbounded. Bands are configurable, must not overlap, and may have gaps. Unmatched quantities are unpriced. The folding price is a flat charge for the entire job, selected by the band containing the job quantity (not pages in a section multiplied by job quantity); it is not multiplied by the number of batches. For example, with the default bands, a job quantity of 1,001 costs GHS 15 in total. When saving an estimate line, the flat charge is divided by the displayed batch quantity to preserve the existing quantity-times-unit-price contract; the estimate snapshot retains the actual flat price. Other prices use the unit of their respective calculation.
+Backend changes to make or verify:
 
-Before connecting a backend, agree on the endpoint, HTTP method, response/error format, and exact numeric precision. The backend must validate nonnegative finite prices and reject duplicate keys `(category, option, sizeMm, minQuantity, maxQuantity)` and overlapping tiers. The server must scope the setup to the authenticated tenant and return the same setup so users and devices see saved prices. The estimate page loads prices from the API and retains a snapshot in saved estimates.
+- Accept, persist and return arbitrary positive numeric width keys, including decimals, for each existing type. Replace fixed-width DTO fields, database columns or validation lists with a dictionary/JSON object or child records keyed by setup, type and numeric width. Preserve old values when migrating existing setups.
+- Treat the submitted lamination object as the complete set of sizes for that setup: a removed key stays removed and `{}` means no sizes for that type. Do not merge deleted widths back from defaults. Save atomically with the rest of the setup, scoped to the authenticated tenant.
+- Validate positive finite widths and non-negative finite prices; normalize numeric width keys so `460` and `460.0` cannot coexist for the same type. `null` is an unset price; `0` is valid. Preserve both and return numeric prices (not strings).
+- `ListAll` must return the same type-to-width-to-price shape (including custom widths and nulls) inside its existing response envelope. Existing fixed-size objects in this shape continue to load. The frontend still uses the existing `create` endpoint, so verify its semantics and any backend restrictions before relying on changes being visible across sessions.
 
-## Current setup service
+On the new estimate, each lamination row lists widths configured for its own type. A selected width supplies the unit price and feeds the existing quantity formula. Saved estimate snapshots retain their own configuration; a previously selected width that is no longer configured is shown as unavailable rather than silently changed.
 
-`services/finishingPrices.ts` calls `FinishingOptionPrice/ListAll` for a single setup and `FinishingOptionPrice/create` to save one. The setup and estimate pages use the API, not browser storage. No update or delete endpoint is defined in the current service; saving uses the create endpoint. The actual backend contract should be verified independently of the proposed record payload above.
+Folding bands remain inclusive, non-overlapping and may contain gaps. A null maximum is unbounded. The job quantity selects one band and its price is charged once as a flat amount. Legacy folding fields are read for migration but excluded from outgoing setup payloads.
