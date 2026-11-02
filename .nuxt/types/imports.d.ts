@@ -8,12 +8,14 @@ declare global {
   const abortNavigation: typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/composables/router')['abortNavigation']
   const acceptHMRUpdate: typeof import('../../node_modules/.pnpm/@pinia+nuxt@0.11.2_magicast@0.3.5_pinia@3.0.3_typescript@5.8.3_vue@3.5.17_typescript@5.8.3__/node_modules/@pinia/nuxt/dist/runtime/composables')['acceptHMRUpdate']
   const activateUser: typeof import('../../services/userManagement')['activateUser']
+  const addOptions: typeof import('../../utils/productionFinishingOptions')['addOptions']
   const addPossesive: typeof import('../../utils/helpers')['addPossesive']
   const addRouteMiddleware: typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/composables/router')['addRouteMiddleware']
   const advanceWorkflowStage: typeof import('../../services/productionRequests')['advanceWorkflowStage']
   const approveEstimate: typeof import('../../services/estimates')['approveEstimate']
   const approveProductionRequest: typeof import('../../services/productionRequests')['approveProductionRequest']
   const approveQuotation: typeof import('../../services/quotations')['approveQuotation']
+  const bindingOptions: typeof import('../../utils/productionFinishingOptions')['bindingOptions']
   const bookworkQuantities: typeof import('../../utils/finishingPricing')['bookworkQuantities']
   const buildFinishingPricesRequest: typeof import('../../utils/finishingPricing')['buildFinishingPricesRequest']
   const buildQueryParams: typeof import('../../utils/helpers')['buildQueryParams']
@@ -26,6 +28,7 @@ declare global {
   const clearNuxtState: typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/composables/state')['clearNuxtState']
   const computed: typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['computed']
   const confirmVerificationCode: typeof import('../../services/userAccount')['confirmVerificationCode']
+  const coverMaterialOvers: typeof import('../../utils/finishingPricing')['coverMaterialOvers']
   const createDepartment: typeof import('../../services/departments')['createDepartment']
   const createError: typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/composables/error')['createError']
   const createEstimateType: typeof import('../../services/estimateTypes')['createEstimateType']
@@ -96,11 +99,16 @@ declare global {
   const effect: typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['effect']
   const effectScope: typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['effectScope']
   const emptyFinishingPrices: typeof import('../../utils/finishingPricing')['emptyFinishingPrices']
+  const fetchAllFinishedArtefactSizes: typeof import('../../utils/finishedArtefactSizeOptions')['fetchAllFinishedArtefactSizes']
   const filterQueryParams: typeof import('../../utils/helpers')['filterQueryParams']
+  const findFinishingOption: typeof import('../../utils/productionFinishingOptions')['findFinishingOption']
+  const findLaminationOption: typeof import('../../utils/productionFinishingOptions')['findLaminationOption']
+  const finishingOptionGroups: typeof import('../../utils/productionFinishingOptions')['finishingOptionGroups']
   const finishingPricesFromApi: typeof import('../../utils/finishingPricing')['finishingPricesFromApi']
   const finishingSlug: typeof import('../../utils/finishingOptions')['finishingSlug']
   const foldingPrice: typeof import('../../utils/finishingPricing')['foldingPrice']
   const formatAscurrency: typeof import('../../utils/helpers')['formatAscurrency']
+  const formatFinishedArtefactSize: typeof import('../../utils/finishedArtefactSizeOptions')['formatFinishedArtefactSize']
   const generateEmptyGuid: typeof import('../../utils/helpers')['generateEmptyGuid']
   const generateReceiptNumber: typeof import('../../utils/helpers')['generateReceiptNumber']
   const generateSku: typeof import('../../utils/helpers')['generateSku']
@@ -179,6 +187,13 @@ declare global {
   const isVue2: typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/compat/vue-demi')['isVue2']
   const isVue3: typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/compat/vue-demi')['isVue3']
   const isoDateFormat: typeof import('../../utils/filters')['isoDateFormat']
+  const laminateOptions: typeof import('../../utils/productionFinishingOptions')['laminateOptions']
+  const laminationDescription: typeof import('../../utils/productionFinishingOptions')['laminationDescription']
+  const laminationFromRows: typeof import('../../utils/finishingPricing')['laminationFromRows']
+  const laminationQuantity: typeof import('../../utils/finishingPricing')['laminationQuantity']
+  const laminationRows: typeof import('../../utils/finishingPricing')['laminationRows']
+  const laminationSizes: typeof import('../../utils/finishingPricing')['laminationSizes']
+  const laminationUnitPrice: typeof import('../../utils/finishingPricing')['laminationUnitPrice']
   const loadPayload: typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/composables/payload')['loadPayload']
   const longDateAndTimeFormat: typeof import('../../utils/filters')['longDateAndTimeFormat']
   const longDateFormat: typeof import('../../utils/filters')['longDateFormat']
@@ -236,6 +251,7 @@ declare global {
   const shallowRef: typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['shallowRef']
   const shortDateFormat: typeof import('../../utils/filters')['shortDateFormat']
   const showError: typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/composables/error')['showError']
+  const spotOptions: typeof import('../../utils/productionFinishingOptions')['spotOptions']
   const standardDateFormat: typeof import('../../utils/filters')['standardDateFormat']
   const storeToRefs: typeof import('../../node_modules/.pnpm/@pinia+nuxt@0.11.2_magicast@0.3.5_pinia@3.0.3_typescript@5.8.3_vue@3.5.17_typescript@5.8.3__/node_modules/@pinia/nuxt/dist/runtime/composables')['storeToRefs']
   const toAbs: typeof import('../../utils/filters')['toAbs']
@@ -357,6 +373,7 @@ declare global {
   const useTransitionState: typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['useTransitionState']
   const useUserStore: typeof import('../../stores/useUserStore')['useUserStore']
   const validateFoldingTiers: typeof import('../../utils/finishingPricing')['validateFoldingTiers']
+  const vanishOptions: typeof import('../../utils/productionFinishingOptions')['vanishOptions']
   const watch: typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['watch']
   const watchEffect: typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['watchEffect']
   const watchPostEffect: typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['watchPostEffect']
@@ -374,7 +391,7 @@ declare global {
   export type { Component, ComponentPublicInstance, ComputedRef, DirectiveBinding, ExtractDefaultPropTypes, ExtractPropTypes, ExtractPublicPropTypes, InjectionKey, PropType, Ref, MaybeRef, MaybeRefOrGetter, VNode, WritableComputedRef } from '../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue'
   import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')
   // @ts-ignore
-  export type { FoldingTier, FinishingPrices, FinishingPriceRecord, FinishingPricesSaveRequest } from '../../utils/finishingPricing'
+  export type { FoldingTier, FinishingPrices, LaminationSizeRow, FinishingPriceRecord, FinishingPricesSaveRequest } from '../../utils/finishingPricing'
   import('../../utils/finishingPricing')
   // @ts-ignore
   export type { NewsPaper } from '../../services/customers'
@@ -391,12 +408,14 @@ declare module 'vue' {
     readonly abortNavigation: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/composables/router')['abortNavigation']>
     readonly acceptHMRUpdate: UnwrapRef<typeof import('../../node_modules/.pnpm/@pinia+nuxt@0.11.2_magicast@0.3.5_pinia@3.0.3_typescript@5.8.3_vue@3.5.17_typescript@5.8.3__/node_modules/@pinia/nuxt/dist/runtime/composables')['acceptHMRUpdate']>
     readonly activateUser: UnwrapRef<typeof import('../../services/userManagement')['activateUser']>
+    readonly addOptions: UnwrapRef<typeof import('../../utils/productionFinishingOptions')['addOptions']>
     readonly addPossesive: UnwrapRef<typeof import('../../utils/helpers')['addPossesive']>
     readonly addRouteMiddleware: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/composables/router')['addRouteMiddleware']>
     readonly advanceWorkflowStage: UnwrapRef<typeof import('../../services/productionRequests')['advanceWorkflowStage']>
     readonly approveEstimate: UnwrapRef<typeof import('../../services/estimates')['approveEstimate']>
     readonly approveProductionRequest: UnwrapRef<typeof import('../../services/productionRequests')['approveProductionRequest']>
     readonly approveQuotation: UnwrapRef<typeof import('../../services/quotations')['approveQuotation']>
+    readonly bindingOptions: UnwrapRef<typeof import('../../utils/productionFinishingOptions')['bindingOptions']>
     readonly bookworkQuantities: UnwrapRef<typeof import('../../utils/finishingPricing')['bookworkQuantities']>
     readonly buildFinishingPricesRequest: UnwrapRef<typeof import('../../utils/finishingPricing')['buildFinishingPricesRequest']>
     readonly buildQueryParams: UnwrapRef<typeof import('../../utils/helpers')['buildQueryParams']>
@@ -409,6 +428,7 @@ declare module 'vue' {
     readonly clearNuxtState: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/composables/state')['clearNuxtState']>
     readonly computed: UnwrapRef<typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['computed']>
     readonly confirmVerificationCode: UnwrapRef<typeof import('../../services/userAccount')['confirmVerificationCode']>
+    readonly coverMaterialOvers: UnwrapRef<typeof import('../../utils/finishingPricing')['coverMaterialOvers']>
     readonly createDepartment: UnwrapRef<typeof import('../../services/departments')['createDepartment']>
     readonly createError: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/composables/error')['createError']>
     readonly createEstimateType: UnwrapRef<typeof import('../../services/estimateTypes')['createEstimateType']>
@@ -479,11 +499,16 @@ declare module 'vue' {
     readonly effect: UnwrapRef<typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['effect']>
     readonly effectScope: UnwrapRef<typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['effectScope']>
     readonly emptyFinishingPrices: UnwrapRef<typeof import('../../utils/finishingPricing')['emptyFinishingPrices']>
+    readonly fetchAllFinishedArtefactSizes: UnwrapRef<typeof import('../../utils/finishedArtefactSizeOptions')['fetchAllFinishedArtefactSizes']>
     readonly filterQueryParams: UnwrapRef<typeof import('../../utils/helpers')['filterQueryParams']>
+    readonly findFinishingOption: UnwrapRef<typeof import('../../utils/productionFinishingOptions')['findFinishingOption']>
+    readonly findLaminationOption: UnwrapRef<typeof import('../../utils/productionFinishingOptions')['findLaminationOption']>
+    readonly finishingOptionGroups: UnwrapRef<typeof import('../../utils/productionFinishingOptions')['finishingOptionGroups']>
     readonly finishingPricesFromApi: UnwrapRef<typeof import('../../utils/finishingPricing')['finishingPricesFromApi']>
     readonly finishingSlug: UnwrapRef<typeof import('../../utils/finishingOptions')['finishingSlug']>
     readonly foldingPrice: UnwrapRef<typeof import('../../utils/finishingPricing')['foldingPrice']>
     readonly formatAscurrency: UnwrapRef<typeof import('../../utils/helpers')['formatAscurrency']>
+    readonly formatFinishedArtefactSize: UnwrapRef<typeof import('../../utils/finishedArtefactSizeOptions')['formatFinishedArtefactSize']>
     readonly generateEmptyGuid: UnwrapRef<typeof import('../../utils/helpers')['generateEmptyGuid']>
     readonly generateReceiptNumber: UnwrapRef<typeof import('../../utils/helpers')['generateReceiptNumber']>
     readonly generateSku: UnwrapRef<typeof import('../../utils/helpers')['generateSku']>
@@ -562,6 +587,13 @@ declare module 'vue' {
     readonly isVue2: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/compat/vue-demi')['isVue2']>
     readonly isVue3: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/compat/vue-demi')['isVue3']>
     readonly isoDateFormat: UnwrapRef<typeof import('../../utils/filters')['isoDateFormat']>
+    readonly laminateOptions: UnwrapRef<typeof import('../../utils/productionFinishingOptions')['laminateOptions']>
+    readonly laminationDescription: UnwrapRef<typeof import('../../utils/productionFinishingOptions')['laminationDescription']>
+    readonly laminationFromRows: UnwrapRef<typeof import('../../utils/finishingPricing')['laminationFromRows']>
+    readonly laminationQuantity: UnwrapRef<typeof import('../../utils/finishingPricing')['laminationQuantity']>
+    readonly laminationRows: UnwrapRef<typeof import('../../utils/finishingPricing')['laminationRows']>
+    readonly laminationSizes: UnwrapRef<typeof import('../../utils/finishingPricing')['laminationSizes']>
+    readonly laminationUnitPrice: UnwrapRef<typeof import('../../utils/finishingPricing')['laminationUnitPrice']>
     readonly loadPayload: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/composables/payload')['loadPayload']>
     readonly longDateAndTimeFormat: UnwrapRef<typeof import('../../utils/filters')['longDateAndTimeFormat']>
     readonly longDateFormat: UnwrapRef<typeof import('../../utils/filters')['longDateFormat']>
@@ -619,6 +651,7 @@ declare module 'vue' {
     readonly shallowRef: UnwrapRef<typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['shallowRef']>
     readonly shortDateFormat: UnwrapRef<typeof import('../../utils/filters')['shortDateFormat']>
     readonly showError: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt@3.17.7_@netlify+blobs@9.1.2_@parcel+watcher@2.5.1_@types+node@24.0.15_@vue+compile_a7cf83dd2c135482f8fcff88ebdb7c08/node_modules/nuxt/dist/app/composables/error')['showError']>
+    readonly spotOptions: UnwrapRef<typeof import('../../utils/productionFinishingOptions')['spotOptions']>
     readonly standardDateFormat: UnwrapRef<typeof import('../../utils/filters')['standardDateFormat']>
     readonly storeToRefs: UnwrapRef<typeof import('../../node_modules/.pnpm/@pinia+nuxt@0.11.2_magicast@0.3.5_pinia@3.0.3_typescript@5.8.3_vue@3.5.17_typescript@5.8.3__/node_modules/@pinia/nuxt/dist/runtime/composables')['storeToRefs']>
     readonly toAbs: UnwrapRef<typeof import('../../utils/filters')['toAbs']>
@@ -740,6 +773,7 @@ declare module 'vue' {
     readonly useTransitionState: UnwrapRef<typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['useTransitionState']>
     readonly useUserStore: UnwrapRef<typeof import('../../stores/useUserStore')['useUserStore']>
     readonly validateFoldingTiers: UnwrapRef<typeof import('../../utils/finishingPricing')['validateFoldingTiers']>
+    readonly vanishOptions: UnwrapRef<typeof import('../../utils/productionFinishingOptions')['vanishOptions']>
     readonly watch: UnwrapRef<typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['watch']>
     readonly watchEffect: UnwrapRef<typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['watchEffect']>
     readonly watchPostEffect: UnwrapRef<typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['watchPostEffect']>

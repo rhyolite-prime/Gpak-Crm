@@ -90,7 +90,6 @@ const title = (value: string) => value.replace(/-/g, ' ').replace(/\b\w/g, c => 
       </section>
       <section class="rounded-xl border border-gray-200 bg-white p-6"><h2 class="text-lg font-bold">Spot finish</h2><p class="mt-1 text-sm text-gray-500">Set a unit price for each finish.</p><div class="mt-5 grid gap-4 sm:grid-cols-3"><label v-for="type in SPOT_TYPES" :key="type" class="space-y-1"><span class="block text-sm font-semibold text-gray-700">{{ title(type) }}</span><input v-model.number="prices.spot[type]" type="number" min="0" step="any" placeholder="Not set" class="w-full border border-gray-300 px-3 py-2" /></label></div></section>
       <div class="flex flex-wrap items-center gap-4"><button type="submit" :disabled="isSaving" class="btn-primary">{{ isSaving ? 'Saving…' : 'Save prices' }}</button><span v-if="saved" role="status" class="text-sm text-green-700">Price setup saved.</span><span v-if="saveError" role="alert" class="text-sm text-red-700">{{ saveError }}</span></div>
-      <p v-if="hasRecord" class="text-xs text-gray-500">Saving creates a new price setup; it does not update the selected record.</p>
     </form>
     </template>
   </div>
