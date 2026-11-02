@@ -95,7 +95,8 @@ export function laminationUnitPrice(prices: FinishingPrices, type: string, size:
 
 export function bookworkQuantities(pagesInSection: number, jobQuantity: number, pages: number, coverQuantity: number, coverOvers: number, outs: number, size: number, spotOvers: number) {
   const collate = pagesInSection * jobQuantity
-  return { collate, folding: Math.ceil(collate / 1000), perfectBind: pages * jobQuantity, binding: jobQuantity, lamination: laminationQuantity(coverQuantity, coverOvers, outs, size), spot: jobQuantity + spotOvers }
+  const foldingQuantity = Math.max(jobQuantity, 1000)
+  return { collate, folding: Math.ceil(pagesInSection * foldingQuantity / 1000), perfectBind: pages * jobQuantity, binding: jobQuantity, lamination: laminationQuantity(coverQuantity, coverOvers, outs, size), spot: jobQuantity + spotOvers }
 }
 /** Migrate setups and estimate snapshots saved before configurable bands existed. */
 export function getFoldingTiers(prices: Partial<FinishingPrices> & { foldingUpTo1000?: number | null; foldingAbove1000?: number | null }): FoldingTier[] {
