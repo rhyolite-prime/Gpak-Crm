@@ -34,10 +34,11 @@ export { useBusinessAuthIdentity } from '../composables/useBusinessAuthIdentity'
 export { useFormulaEvaluator } from '../composables/useFormulaEvaluator';
 export { useHttpClient, getBusinessAuthIdentityHeaders } from '../composables/useHttpClient';
 export { usePermissions } from '../composables/usePermssions';
+export { ESTIMATE_SNAPSHOT_KEY, ESTIMATE_SNAPSHOT_VERSION, buildEstimateSnapshot, readEstimateSnapshot, isNewEstimate, readComplexVariable, EstimateSnapshot } from '../utils/estimateSnapshot';
 export { dateAndTimeFormat, standardDateFormat, longDateFormat, rawTimeFormat, longDateAndTimeFormat, dateFormat, isoDateFormat, shortDateFormat, _currency, toNumber, toAbs } from '../utils/filters';
 export { formatFinishedArtefactSize, fetchAllFinishedArtefactSizes } from '../utils/finishedArtefactSizeOptions';
 export { finishingSlug, serializeFinishingOptions, parseSurfaceFinish } from '../utils/finishingOptions';
-export { LAMINATION_TYPES, LAMINATION_SIZES, SPOT_TYPES, defaultFinishingPrices, emptyFinishingPrices, finishingPricesFromApi, laminationFromRows, laminationRows, laminationSizes, laminationQuantity, coverMaterialOvers, laminationUnitPrice, bookworkQuantities, getFoldingTiers, toFinishingPricesPayload, foldingPrice, validateFoldingTiers, buildFinishingPricesRequest, FoldingTier, FinishingPrices, LaminationSizeRow, FinishingPriceRecord, FinishingPricesSaveRequest } from '../utils/finishingPricing';
+export { LAMINATION_TYPES, LAMINATION_SIZES, SPOT_TYPES, defaultFinishingPrices, emptyFinishingPrices, finishingPricesFromApi, laminationFromRows, laminationRows, laminationSizes, laminationQuantity, coverMaterialInputs, coverMaterialOvers, laminationUnitPrice, bookworkQuantities, getFoldingTiers, toFinishingPricesPayload, foldingPrice, validateFoldingTiers, buildFinishingPricesRequest, FoldingTier, FinishingPrices, LaminationSizeRow, FinishingPriceRecord, FinishingPricesSaveRequest } from '../utils/finishingPricing';
 export { isMobileScreen, getCurrentDate, formatAscurrency, generateReceiptNumber, generateUniqueIdentifier, generateSku, buildQueryParams, filterQueryParams, replacePartOfString, scrollTop, isValidEmail, isValidPhoneNumber, isNullOrUndefined, isUndefined, isNumber, isString, addPossesive, generateEmptyGuid } from '../utils/helpers';
 export { bindingOptions, addOptions, laminateOptions, vanishOptions, spotOptions, finishingOptionGroups, findFinishingOption, findLaminationOption, laminationDescription } from '../utils/productionFinishingOptions';
 export { NewsPaper } from '../services/customers';
