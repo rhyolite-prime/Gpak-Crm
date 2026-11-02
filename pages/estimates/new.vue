@@ -283,7 +283,6 @@
                     </td>
                     <td class="px-4 py-2">
                       <input v-model.number="row.unitPrice" :readonly="!!row.finishingKind" :placeholder="row.finishingKind ? 'Not set' : ''" type="number" class="w-full border border-gray-300 rounded p-1 text-right text-sm focus:ring-red-500 focus:border-red-500" step="any" />
-                      <span v-if="row.finishingKind === 'folding'" class="block text-right text-xs text-gray-500">Flat band price</span>
                     </td>
                     <td class="px-4 py-2 text-right text-sm font-medium text-gray-900">
                       {{ formatCurrency(lineTotal(row)) }}
