@@ -141,16 +141,7 @@
         <div class="flex justify-between items-end mb-4">
           <h3 class="text-sm font-bold uppercase tracking-wider text-gray-700 border-b-2 border-red-600 pb-2 inline-block">Estimation Sheet</h3>
         </div>
-        <div v-if="form.templateType === 'bookwork'" class="mb-4 rounded-xl border border-gray-200 bg-white p-4">
-          <div class="flex flex-wrap items-center justify-between gap-2"><div><h4 class="text-sm font-bold text-gray-800">Bookwork finishing</h4><p class="mt-1 text-xs text-gray-500">Collate and folding are included automatically. Choose any binding and surface finish required.</p></div><div class="flex gap-4"><button type="button" class="text-xs font-semibold text-gray-600 hover:underline" @click="refreshFinishingPrices" :disabled="isLoadingFinishingPrices">{{ isLoadingFinishingPrices ? 'Loading prices…' : 'Reload prices' }}</button><NuxtLink to="/setups/finishing-prices" target="_blank" class="text-xs font-semibold text-red-700 hover:underline">Manage finishing prices ↗</NuxtLink></div></div>
-          <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <label class="text-xs font-semibold text-gray-600">Binding<select v-model="finishingSelection.binding" class="mt-1 w-full border border-gray-300 bg-white px-2 py-2 text-sm"><option value="">None</option><option value="perfect-bind">Perfect bind</option><option value="saddle-stitch">Saddle stitch</option><option value="case-bind">Case bind</option></select></label>
-            <label class="text-xs font-semibold text-gray-600">Surface finish<select v-model="finishingSelection.surface" class="mt-1 w-full border border-gray-300 bg-white px-2 py-2 text-sm"><option value="">None</option><option value="lamination">Lamination</option><option value="spot">Spot finish</option></select></label>
-            <template v-if="finishingSelection.surface === 'lamination'"><label class="text-xs font-semibold text-gray-600">Lamination type<select v-model="finishingSelection.laminateType" class="mt-1 w-full border border-gray-300 bg-white px-2 py-2 text-sm"><option v-for="type in LAMINATION_TYPES" :key="type" :value="type">{{ type.replace(/-/g, ' ') }}</option></select></label><label class="text-xs font-semibold text-gray-600">Laminant width (mm)<select v-model="finishingSelection.laminateSize" class="mt-1 w-full border border-gray-300 bg-white px-2 py-2 text-sm"><option v-for="size in LAMINATION_SIZES" :key="size" :value="size">{{ size }} mm</option></select></label></template>
-            <label v-if="finishingSelection.surface === 'spot'" class="text-xs font-semibold text-gray-600">Spot finish type<select v-model="finishingSelection.spotType" class="mt-1 w-full border border-gray-300 bg-white px-2 py-2 text-sm"><option v-for="type in SPOT_TYPES" :key="type" :value="type">{{ type.replace(/-/g, ' ') }}</option></select></label>
-          </div>
-          <p v-if="missingFinishingPrices" role="status" class="mt-3 text-xs text-amber-700">Some finishing prices are not set or no folding price band matches. Configure prices and reload before relying on the estimate total.</p>
-        </div>
+        
         <div class="overflow-x-auto border border-gray-200 rounded-lg">
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-100">
