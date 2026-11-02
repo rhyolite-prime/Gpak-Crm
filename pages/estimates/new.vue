@@ -707,7 +707,7 @@ const updateBookworkFinishing = () => {
   const prices = finishingPrices.value;
   const bindingPrice = finishingSelection.binding === 'perfect-bind' ? prices.perfectBind : finishingSelection.binding === 'saddle-stitch' ? prices.saddleStitch : prices.caseBind;
   const values: Record<string, [number, number | null]> = {
-    collate: [qty.collate, prices.collate], folding: [qty.folding, foldingPrice(qty.collate, prices)],
+    collate: [qty.collate, prices.collate], folding: [qty.folding, foldingPrice(Number(form.quantity) || 0, prices)],
     binding: [finishingSelection.binding === 'perfect-bind' ? qty.perfectBind : qty.binding, bindingPrice],
     lamination: [qty.lamination, prices.lamination?.[finishingSelection.laminateType]?.[finishingSelection.laminateSize] ?? null],
     spot: [qty.spot, prices.spot?.[finishingSelection.spotType] ?? null],

@@ -86,3 +86,24 @@ test('API setup is a single object and empty responses produce a blank template'
   assert.throws(() => finishingPricesFromApi([]), /Unexpected/)
   assert.throws(() => finishingPricesFromApi({ error: true }), /Unexpected/)
 })
+
+test('folding band uses job quantity, not collated pieces or folding batches', () => {
+  const prices = defaultFinishingPrices()
+  prices.foldingTiers = [
+    { minQuantity: 100, maxQuantity: 1000, price: 20 },
+    { minQuantity: 1001, maxQuantity: null, price: 15 },
+  ]
+  const jobQuantity = 200
+  const quantities = bookworkQuantities(8, jobQuantity, 64, 0, 0, 0, 0, 0)
+  assert.equal(quantities.collate, 1600)
+  assert.equal(quantities.folding, 2)
+  assert.equal(foldingPrice(jobQuantity, prices), 20)
+  assert.equal(foldingPrice(1000, prices), 20)
+  assert.equal(foldingPrice(1001, prices), 15)
+})
+
+test('new estimate selects the folding band using form job quantity', async () => {
+  const { readFile } = await import('node:fs/promises')
+  const page = await readFile(new URL('../pages/estimates/new.vue', import.meta.url), 'utf8')
+  assert.match(page, /folding:\s*\[qty\.folding,\s*foldingPrice\(Number\(form\.quantity\)\s*\|\|\s*0,\s*prices\)\]/)
+})

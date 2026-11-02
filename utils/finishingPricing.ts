@@ -76,10 +76,10 @@ export function toFinishingPricesPayload(prices: Partial<FinishingPrices> & { fo
   }
 }
 
-/** Price is a flat charge for the one band containing the total number of pieces. */
-export function foldingPrice(pieces: number, prices: FinishingPrices): number | null {
-  if (!Number.isFinite(pieces) || pieces <= 0) return null
-  const tier = getFoldingTiers(prices).find(t => pieces >= t.minQuantity && (t.maxQuantity == null || pieces <= t.maxQuantity))
+/** Flat charge selected by the job quantity, independently of the folding batch quantity. */
+export function foldingPrice(jobQuantity: number, prices: FinishingPrices): number | null {
+  if (!Number.isFinite(jobQuantity) || jobQuantity <= 0) return null
+  const tier = getFoldingTiers(prices).find(t => jobQuantity >= t.minQuantity && (t.maxQuantity == null || jobQuantity <= t.maxQuantity))
   return typeof tier?.price === 'number' && Number.isFinite(tier.price) && tier.price >= 0 ? tier.price : null
 }
 
