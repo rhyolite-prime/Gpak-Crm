@@ -138,6 +138,7 @@
 
       <!-- ESTIMATE TABLE -->
       <section class="mb-8">
+        
         <div class="flex justify-between items-end mb-4">
           <h3 class="text-sm font-bold uppercase tracking-wider text-gray-700 border-b-2 border-red-600 pb-2 inline-block">Estimation Sheet</h3>
         </div>
