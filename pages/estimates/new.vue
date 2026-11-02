@@ -395,7 +395,7 @@
 
 <script setup lang="ts">
 import { useRoute, useRouter, useNuxtApp } from '#app';
-import { ESTIMATE_SNAPSHOT_KEY, serializeEstimateSnapshot, readEstimateSnapshot } from '~/utils/estimateSnapshot';
+import { ESTIMATE_SNAPSHOT_KEY, buildEstimateSnapshot, readEstimateSnapshot, readComplexVariable } from '~/utils/estimateSnapshot';
 import { finishingOptionGroups, findFinishingOption, findLaminationOption, laminationDescription } from '~/utils/productionFinishingOptions';
 import { emptyFinishingPrices, finishingPricesFromApi, bookworkQuantities, foldingPrice, laminationQuantity, laminationUnitPrice, coverMaterialInputs, toFinishingPricesPayload, laminationSizes, LAMINATION_TYPES, SPOT_TYPES } from '~/utils/finishingPricing';
 import { getProductionRequestDetails } from '~/services/productionRequests';
@@ -1044,7 +1044,7 @@ const formatCurrency = (value: number) =>
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 /** Encode a key/value pair as an EstimationVariable */
-const makeVar = (name: string, systemName: string, value: string) => ({ name, systemName, value });
+const makeVar = (name: string, systemName: string, value: unknown) => ({ name, systemName, value });
 
 /** Decode a saved variable by systemName from a variables array */
 const getVar = (vars: any[], systemName: string) =>
@@ -1081,12 +1081,12 @@ const saveEstimate = async () => {
       makeVar('Waste Factor',           'wasteFactor',           String(form.wasteFactor ?? 0.1)),
       makeVar('Margin %',               'marginPercentage',      String(form.marginPercentage ?? 35)),
       makeVar('Tax %',                  'taxPercentage',         String(form.taxPercentage ?? 20)),
-      // Summary fields (JSON-encoded so the edit page can restore them)
-      makeVar('Summaries',              'summaries',             JSON.stringify(form.summaries)),
-      makeVar('Finishing selection', 'finishingSelection', JSON.stringify(finishingSelection)),
-      makeVar('Finishing prices', 'finishingPrices', JSON.stringify(toFinishingPricesPayload(finishingPrices.value))),
-      makeVar('Estimate rows', 'estimateRows', JSON.stringify(form.tableRows)),
-      makeVar('New estimate snapshot', ESTIMATE_SNAPSHOT_KEY, serializeEstimateSnapshot(form, finishingSelection, toFinishingPricesPayload(finishingPrices.value), productionRequest.value ? {
+      // Structured values remain JSON arrays/objects in the API payload.
+      makeVar('Summaries',              'summaries',             form.summaries),
+      makeVar('Finishing selection', 'finishingSelection', finishingSelection),
+      makeVar('Finishing prices', 'finishingPrices', toFinishingPricesPayload(finishingPrices.value)),
+      makeVar('Estimate rows', 'estimateRows', form.tableRows),
+      makeVar('New estimate snapshot', ESTIMATE_SNAPSHOT_KEY, buildEstimateSnapshot(form, finishingSelection, toFinishingPricesPayload(finishingPrices.value), productionRequest.value ? {
         requestNumber: productionRequest.value.requestNumber ?? '',
         customerName: productionRequest.value.customerName ?? productionRequest.value.customer ?? '',
         jobName: productionRequest.value.jobName ?? '',
@@ -1147,7 +1147,7 @@ const saveEstimate = async () => {
       // Line items
       details,
 
-      // All new.vue-specific inputs encoded as variables for edit round-trip
+      // All new.vue-specific inputs in variables for edit round-trip
       variables: headerVars,
 
       // Linking
@@ -1185,7 +1185,7 @@ const saveEstimate = async () => {
 /**
  * Loads an existing estimate from the API and hydrates the form so the user
  * can edit it exactly as it was originally created.
- * All new.vue-specific inputs were encoded as `variables` on save, so we
+ * New.vue-specific inputs are stored as `variables` on save, so we
  * decode them here and let the existing watchers re-run all calculations.
  */
 const loadEstimateForEdit = async (id: string) => {
@@ -1244,16 +1244,16 @@ const loadEstimateForEdit = async (id: string) => {
     onTemplateChange();
     const savedSummaries = getVar(vars, 'summaries');
     if (savedSummaries) {
-      try { form.summaries = JSON.parse(savedSummaries); } catch { /* keep default */ }
+      try { form.summaries = readComplexVariable(savedSummaries) as SummaryField[]; } catch { /* keep default */ }
     }
 
     const savedSelection = getVar(vars, 'finishingSelection');
     const savedPrices = getVar(vars, 'finishingPrices');
     const savedRows = getVar(vars, 'estimateRows');
-    try { if (savedSelection) Object.assign(finishingSelection, JSON.parse(savedSelection)); } catch { /* retain defaults */ }
-    try { if (savedPrices) finishingPrices.value = JSON.parse(savedPrices); } catch { /* retain browser prices */ }
+    try { if (savedSelection) Object.assign(finishingSelection, readComplexVariable(savedSelection)); } catch { /* retain defaults */ }
+    try { if (savedPrices) finishingPrices.value = readComplexVariable(savedPrices) as typeof finishingPrices.value; } catch { /* retain browser prices */ }
     let restoredRows = false;
-    try { const rows = savedRows && JSON.parse(savedRows); if (Array.isArray(rows)) { form.tableRows = rows; restoredRows = true; } } catch { /* fall back to legacy details */ }
+    try { const rows = savedRows && readComplexVariable(savedRows); if (Array.isArray(rows)) { form.tableRows = rows; restoredRows = true; } } catch { /* fall back to legacy details */ }
     const savedDetails: any[] = estimate.details ?? [];
     if (!restoredRows) savedDetails.forEach(d => {
       // Try to match against an existing template row by description

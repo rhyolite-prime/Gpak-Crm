@@ -28,7 +28,22 @@ The new estimate form posts the same object shape to `estimation/create` or `est
   ],
   "variables": [
     { "name": "Template Type", "systemName": "templateType", "value": "bookwork" },
-    { "name": "New estimate snapshot", "systemName": "newEstimateSnapshot", "value": "{\"version\":1,\"form\":{...},\"finishingSelection\":{...},\"finishingPrices\":{...},\"productionRequest\":null,\"productionRequestId\":\"\"}" }
+    { "name": "Summaries", "systemName": "summaries", "value": [{ "label": "Summary 1", "value": "Example" }] },
+    { "name": "Finishing selection", "systemName": "finishingSelection", "value": { "binding": "", "surface": "", "laminateType": "gloss", "laminateSize": "460", "spotType": "3d-matt", "spotOvers": 0 } },
+    { "name": "Finishing prices", "systemName": "finishingPrices", "value": { "collate": 1.3, "foldingTiers": [], "perfectBind": null, "saddleStitch": null, "caseBind": null, "lamination": { "gloss": { "460": 2.3 }, "matt": {}, "soft-touch": {}, "saudy": {} }, "spot": { "3d-matt": null, "3d-gloss": null, "3d-pattern": null } } },
+    { "name": "Estimate rows", "systemName": "estimateRows", "value": [{ "id": "row-1", "category": "Paper info", "description": "Cover paper", "quantity": 100, "unitPrice": 1, "inventoryItemId": "paper-id" }] },
+    { "name": "New estimate snapshot", "systemName": "newEstimateSnapshot", "value": {
+      "version": 1,
+      "form": {
+        "templateType": "bookwork", "date": "2026-11-02", "noOfCoverSides": "1", "client": "Example client", "jobName": "Example job", "quantity": 200, "size": "A4", "pages": 32, "pagesToView": 8, "pagesOut": 2, "noOfColoursCover": 4, "noOfColoursText": 4, "noOfCoversPerSheet": 2, "noOfInsidePlates": 16, "noOfCoverPlates": 1, "wasteFactor": 0.1, "marginPercentage": 35, "taxPercentage": 20,
+        "summaries": [{ "label": "Summary 1", "value": "Example" }],
+        "tableRows": [{ "id": "row-1", "category": "Paper info", "description": "Cover paper", "quantity": 100, "unitPrice": 1, "inventoryItemId": "paper-id" }]
+      },
+      "finishingSelection": { "binding": "", "surface": "", "laminateType": "gloss", "laminateSize": "460", "spotType": "3d-matt", "spotOvers": 0 },
+      "finishingPrices": { "collate": 1.3, "foldingTiers": [], "perfectBind": null, "saddleStitch": null, "caseBind": null, "lamination": { "gloss": { "460": 2.3 }, "matt": {}, "soft-touch": {}, "saudy": {} }, "spot": { "3d-matt": null, "3d-gloss": null, "3d-pattern": null } },
+      "productionRequest": null,
+      "productionRequestId": ""
+    } }
   ],
   "estimatedCost": 162,
   "description": "Example job (Qty: 200, Size: A4)",
@@ -36,7 +51,7 @@ The new estimate form posts the same object shape to `estimation/create` or `est
 }
 ```
 
-The ellipses in the example are illustrative, not literal JSON values. The actual snapshot is generated as a JSON **string** in the variable's `value`; the client also sends the individual legacy variables (`pages`, `pagesToView`, `pagesOut`, `noOfColoursCover`, `noOfColoursText`, `noOfCoversPerSheet`, `noOfInsidePlates`, `noOfCoverPlates`, `noOfCoverSides`, `wasteFactor`, `marginPercentage`, `taxPercentage`, `summaries`, `finishingSelection`, `finishingPrices`, `estimateRows`). If linked, `productionRequestId` is also included at the top level. Server-assigned identity and lifecycle fields must not be inferred from the example.
+The example omits some scalar variables for brevity. All structured variable values, including the snapshot, are native JSON objects or arrays, not JSON-encoded strings. The client also sends the individual legacy variables (`pages`, `pagesToView`, `pagesOut`, `noOfColoursCover`, `noOfColoursText`, `noOfCoversPerSheet`, `noOfInsidePlates`, `noOfCoverPlates`, `noOfCoverSides`, `wasteFactor`, `marginPercentage`, `taxPercentage`, `summaries`, `finishingSelection`, `finishingPrices`, `estimateRows`). If linked, `productionRequestId` is also included at the top level. Server-assigned identity and lifecycle fields must not be inferred from the example.
 
 ## Snapshot v1
 
@@ -48,9 +63,9 @@ The ellipses in the example are illustrative, not literal JSON values. The actua
 
 ## Backend requirements to verify or implement
 
-1. Persist and return every `variables` entry, including unknown `systemName` values, exactly as supplied on both create and update. `newEstimateSnapshot.value` needs enough Unicode text capacity for the complete estimate and must not be truncated, escaped twice, parsed/reformatted destructively or stripped. The detail endpoint must return it in `variables`.
+1. Change the estimate variable DTO and persistence to accept and return native JSON objects and arrays in `value` (as well as legacy scalar strings). Persist every `variables` entry, including unknown `systemName` values, without truncation, stringification, or dropping nested fields. In particular, `newEstimateSnapshot.value` is an object; `summaries` and `estimateRows` values are arrays, and `finishingSelection` and `finishingPrices` values are objects. The detail endpoint must return them as the same JSON types.
 2. Treat updates as an atomic replacement/upsert of the estimate's variables and details, preserving all entries and the production request link. Do not drop empty, zero, null, or nested snapshot fields. Scope reads/writes to the authenticated tenant and perform authorization and validation server-side.
 3. Preserve the canonical top-level fields, detail rows, taxes and totals for reporting and existing consumers. Do not treat the snapshot as trusted financial data: validate/recalculate according to server business rules, and agree on rounding and precedence if server calculations differ.
-4. Verify actual request/response size limits, string storage type, any required DTO fields and API behavior. If variable storage is too small or filters unknown names, add a versioned JSON/text snapshot field or related table and update the client contract. Older records that never stored full rows cannot be perfectly reconstructed.
+4. Verify actual request/response size limits, JSON storage capacity, any required DTO fields and API behavior. Existing string-only variable DTOs or databases must be changed to support structured JSON. The frontend can read old string-encoded snapshots but sends new structured values only. Older records that never stored full rows cannot be perfectly reconstructed.
 
 An end-to-end create → getdetails → edit → update → getdetails test against the real backend is required to establish that the API preserves this contract; frontend tests alone cannot prove it.
