@@ -94,7 +94,9 @@ declare global {
   const deleteWorkflowTransition: typeof import('../../services/workflowTransitions')['deleteWorkflowTransition']
   const effect: typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['effect']
   const effectScope: typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['effectScope']
+  const emptyFinishingPrices: typeof import('../../utils/finishingPricing')['emptyFinishingPrices']
   const filterQueryParams: typeof import('../../utils/helpers')['filterQueryParams']
+  const finishingPricesFromApi: typeof import('../../utils/finishingPricing')['finishingPricesFromApi']
   const finishingSlug: typeof import('../../utils/finishingOptions')['finishingSlug']
   const foldingPrice: typeof import('../../utils/finishingPricing')['foldingPrice']
   const formatAscurrency: typeof import('../../utils/helpers')['formatAscurrency']
@@ -473,7 +475,9 @@ declare module 'vue' {
     readonly deleteWorkflowTransition: UnwrapRef<typeof import('../../services/workflowTransitions')['deleteWorkflowTransition']>
     readonly effect: UnwrapRef<typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['effect']>
     readonly effectScope: UnwrapRef<typeof import('../../node_modules/.pnpm/vue@3.5.17_typescript@5.8.3/node_modules/vue')['effectScope']>
+    readonly emptyFinishingPrices: UnwrapRef<typeof import('../../utils/finishingPricing')['emptyFinishingPrices']>
     readonly filterQueryParams: UnwrapRef<typeof import('../../utils/helpers')['filterQueryParams']>
+    readonly finishingPricesFromApi: UnwrapRef<typeof import('../../utils/finishingPricing')['finishingPricesFromApi']>
     readonly finishingSlug: UnwrapRef<typeof import('../../utils/finishingOptions')['finishingSlug']>
     readonly foldingPrice: UnwrapRef<typeof import('../../utils/finishingPricing')['foldingPrice']>
     readonly formatAscurrency: UnwrapRef<typeof import('../../utils/helpers')['formatAscurrency']>
