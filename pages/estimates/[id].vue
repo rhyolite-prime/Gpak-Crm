@@ -441,6 +441,7 @@
 </template>
 
 <script setup lang="ts">
+import { isNewEstimate } from '~/utils/estimateSnapshot';
 import { Plus, Trash2, Download, Calculator, Zap, Link2, ArrowRightLeft, Loader2, GitMerge, Check, ArrowRight, ChevronRight, RefreshCw } from 'lucide-vue-next';
 import type { FormulaVariable, Formula, Workflow, ProductionRequest } from "~/models";
 const { $toast } = useNuxtApp();
@@ -934,6 +935,10 @@ const loadEstimateDetails = async (id: string) => {
     try {
         const data = await getEstimateDetails(id);
         if (data) {
+            if (isNewEstimate(data.variables)) {
+                await router.replace({ path: '/estimates/new', query: { estimateId: id } });
+                return true;
+            }
             form.id = data.id || id;
             form.businessName = data.businessName || '';
             form.jobName = data.jobName || '';
@@ -1079,7 +1084,7 @@ onMounted(async () => {
         await getAllVariables();
 
         if (id) {
-            await loadEstimateDetails(id);
+            if (await loadEstimateDetails(id)) return;
         }
 
         // After loading the estimate, fetch the associated production request's workflow

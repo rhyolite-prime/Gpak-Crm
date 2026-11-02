@@ -38,6 +38,7 @@
       Loading production request...
     </div>
 
+    <p v-if="estimateLoadError" role="alert" class="mb-6 rounded border border-red-300 bg-red-50 p-4 text-sm text-red-800">{{ estimateLoadError }}</p>
     <form @submit.prevent="saveEstimate">
       <!-- BASIC INFO -->
       <section class="mb-8">
@@ -383,7 +384,7 @@
       <!-- Actions -->
       <div class="flex justify-end gap-4 mt-8 pt-4 border-t border-gray-200">
         <NuxtLink to="/estimates" class="px-6 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50">Cancel</NuxtLink>
-        <button type="submit" :disabled="isSubmitting" class="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 flex items-center gap-2">
+        <button type="submit" :disabled="isSubmitting || isLoadingRequest || !!estimateLoadError" class="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 flex items-center gap-2">
           <span v-if="isSubmitting" class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
           {{ isSubmitting ? 'Saving...' : 'Save Estimate' }}
         </button>
@@ -394,6 +395,7 @@
 
 <script setup lang="ts">
 import { useRoute, useRouter, useNuxtApp } from '#app';
+import { ESTIMATE_SNAPSHOT_KEY, serializeEstimateSnapshot, readEstimateSnapshot } from '~/utils/estimateSnapshot';
 import { finishingOptionGroups, findFinishingOption, findLaminationOption, laminationDescription } from '~/utils/productionFinishingOptions';
 import { emptyFinishingPrices, finishingPricesFromApi, bookworkQuantities, foldingPrice, laminationQuantity, laminationUnitPrice, coverMaterialInputs, toFinishingPricesPayload, laminationSizes, LAMINATION_TYPES, SPOT_TYPES } from '~/utils/finishingPricing';
 import { getProductionRequestDetails } from '~/services/productionRequests';
@@ -409,7 +411,9 @@ const route = useRoute();
 
 // ── State ─────────────────────────────────────────────────────────────────────
 const isSubmitting = ref(false);
-const isLoadingRequest = ref(false);
+const isHydrating = ref(false);
+const estimateLoadError = ref('');
+const isLoadingRequest = ref(!!route.query.estimateId);
 const prodRequestId = ref('');
 const estimateId = ref('');        // populated when editing an existing estimate
 const productionRequest = ref<any>(null);
@@ -605,6 +609,7 @@ const onTemplateChange = () => {
 
 // Watch basic info to auto-compute summary fields for bookwork
 watch([() => form.pages, () => form.pagesToView, () => form.pagesOut, () => form.noOfColoursCover, () => form.noOfColoursText, () => form.quantity, () => form.noOfCoversPerSheet, () => form.noOfInsidePlates, () => form.noOfCoverPlates, () => form.wasteFactor, () => form.noOfCoverSides ], () => {
+  if (isHydrating.value) return;
   if (form.templateType === 'bookwork') {
     const s1 = form.summaries.find(s => s.key === 'pagesInfo');
     if (s1) {
@@ -703,6 +708,7 @@ watch([() => form.pages, () => form.pagesToView, () => form.pagesOut, () => form
 
 // Maintain the automatically calculated finishing lines without touching manually added items.
 const updateBookworkFinishing = () => {
+  if (isHydrating.value) return;
   if (form.templateType !== 'bookwork') return;
   const desired: Record<string, string> = { collate: 'Collate', folding: 'Folding' };
   if (finishingSelection.binding) desired.binding = ({ 'perfect-bind': 'Perfect bind', 'saddle-stitch': 'Saddle stitch', 'case-bind': 'Case bind' } as Record<string, string>)[finishingSelection.binding];
@@ -750,6 +756,7 @@ watch(() => ({
     option: row.finishingOptionValue, size: row.laminateSize, isFinishingOption: row.isFinishingOption,
   })),
 }), () => {
+  if (isHydrating.value) return;
   const cover = coverMaterialInputs(form.tableRows, form.templateType);
   for (const row of form.tableRows) {
     if (!row.isFinishingOption || !row.laminateSize) continue;
@@ -827,7 +834,7 @@ const recalcAllPercentageRows = () => {
   form.tableRows.forEach(row => { if (row.isPercentagePlugin) recalcPercentageRow(row); });
 };
 
-watch(() => form.tableRows, () => { recalcAllPercentageRows(); }, { deep: true });
+watch(() => form.tableRows, () => { if (!isHydrating.value) recalcAllPercentageRows(); }, { deep: true });
 
 const addPercentageRow = () => {
   form.tableRows.push({
@@ -1044,6 +1051,7 @@ const getVar = (vars: any[], systemName: string) =>
   vars.find((v: any) => v.systemName === systemName)?.value ?? null;
 
 const saveEstimate = async () => {
+  if (isLoadingRequest.value || estimateLoadError.value || isSubmitting.value) return;
   isSubmitting.value = true;
 
   try {
@@ -1069,6 +1077,7 @@ const saveEstimate = async () => {
       makeVar('No. of Covers Per Sheet','noOfCoversPerSheet',    String(form.noOfCoversPerSheet ?? '')),
       makeVar('No. of Inside Plates','noOfInsidePlates',  String(form.noOfInsidePlates ?? '')),
       makeVar('No. of Cover Plates',   'noOfCoverPlates',       String(form.noOfCoverPlates ?? '')),
+      makeVar('No. of Cover Sides',    'noOfCoverSides',        String(form.noOfCoverSides ?? '1')),
       makeVar('Waste Factor',           'wasteFactor',           String(form.wasteFactor ?? 0.1)),
       makeVar('Margin %',               'marginPercentage',      String(form.marginPercentage ?? 35)),
       makeVar('Tax %',                  'taxPercentage',         String(form.taxPercentage ?? 20)),
@@ -1077,6 +1086,12 @@ const saveEstimate = async () => {
       makeVar('Finishing selection', 'finishingSelection', JSON.stringify(finishingSelection)),
       makeVar('Finishing prices', 'finishingPrices', JSON.stringify(toFinishingPricesPayload(finishingPrices.value))),
       makeVar('Estimate rows', 'estimateRows', JSON.stringify(form.tableRows)),
+      makeVar('New estimate snapshot', ESTIMATE_SNAPSHOT_KEY, serializeEstimateSnapshot(form, finishingSelection, toFinishingPricesPayload(finishingPrices.value), productionRequest.value ? {
+        requestNumber: productionRequest.value.requestNumber ?? '',
+        customerName: productionRequest.value.customerName ?? productionRequest.value.customer ?? '',
+        jobName: productionRequest.value.jobName ?? '',
+        requestCategory: productionRequest.value.requestCategory ?? '',
+      } : null, prodRequestId.value)),
     ];
 
     // ── Map tableRows → details (EstimateItem shape) ───────────────────────
@@ -1175,14 +1190,30 @@ const saveEstimate = async () => {
  */
 const loadEstimateForEdit = async (id: string) => {
   isLoadingRequest.value = true;
+  estimateLoadError.value = '';
   try {
     const estimate = await getEstimateDetails(id) as any;
     if (!estimate) {
-      $toast.error('Estimate not found.');
+      estimateLoadError.value = 'Estimate not found; saving is disabled.';
       return;
     }
 
+    if (estimate.variables != null && !Array.isArray(estimate.variables)) throw new Error('Estimate variables are not in the expected format.');
     const vars: any[] = estimate.variables ?? [];
+
+    const snapshot = readEstimateSnapshot(vars);
+    isHydrating.value = true;
+    if (snapshot) {
+      // Only copy known form keys, retaining saved row IDs, ordering and overrides.
+      for (const key of Object.keys(form) as (keyof typeof form)[]) {
+        if (Object.prototype.hasOwnProperty.call(snapshot.form, key)) (form as any)[key] = snapshot.form[key];
+      }
+      Object.assign(finishingSelection, snapshot.finishingSelection);
+      finishingPrices.value = finishingPricesFromApi(snapshot.finishingPrices) ?? emptyFinishingPrices();
+      prodRequestId.value = snapshot.productionRequestId || estimate.productionRequestId || '';
+      productionRequest.value = snapshot.productionRequest;
+      return;
+    }
 
     // ── Restore header inputs from encoded variables ───────────────────────
     form.client             = estimate.businessName ?? '';
@@ -1205,17 +1236,16 @@ const loadEstimateForEdit = async (id: string) => {
     form.noOfCoversPerSheet = toNum(getVar(vars, 'noOfCoversPerSheet'));
     form.noOfInsidePlates= toNum(getVar(vars, 'noOfInsidePlates'));
     form.noOfCoverPlates    = toNum(getVar(vars, 'noOfCoverPlates'));
+    form.noOfCoverSides     = String(getVar(vars, 'noOfCoverSides') ?? '1');
     form.wasteFactor        = Number(getVar(vars, 'wasteFactor') ?? 0.1);
     form.taxPercentage      = Number(getVar(vars, 'taxPercentage') ?? 20);
 
-    // Restore summary fields if present
+    // Reset template defaults before restoring saved summaries and rows.
+    onTemplateChange();
     const savedSummaries = getVar(vars, 'summaries');
     if (savedSummaries) {
       try { form.summaries = JSON.parse(savedSummaries); } catch { /* keep default */ }
     }
-
-    // ── Reset template rows first, then patch quantities/prices from details ─
-    onTemplateChange();
 
     const savedSelection = getVar(vars, 'finishingSelection');
     const savedPrices = getVar(vars, 'finishingPrices');
@@ -1253,8 +1283,11 @@ const loadEstimateForEdit = async (id: string) => {
 
   } catch (e) {
     console.error(e);
-    $toast.error('Failed to load estimate for editing.');
+    estimateLoadError.value = e instanceof Error ? `Unable to restore estimate: ${e.message}` : 'Failed to load estimate for editing.';
+    $toast.error(estimateLoadError.value);
   } finally {
+    await nextTick();
+    isHydrating.value = false;
     isLoadingRequest.value = false;
   }
 };
