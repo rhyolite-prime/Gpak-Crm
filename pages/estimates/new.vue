@@ -70,8 +70,14 @@
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div class="flex flex-col gap-1">
-              <label class="text-sm font-semibold text-gray-700">Size</label>
-              <input v-model="form.size" type="text" class="w-full border border-gray-300 rounded p-2 focus:ring-red-500 focus:border-red-500 bg-white" />
+              <label for="estimate-size" class="text-sm font-semibold text-gray-700">Size</label>
+              <select id="estimate-size" v-model="form.size" :disabled="isLoadingSizes" class="w-full border border-gray-300 rounded p-2 focus:ring-red-500 focus:border-red-500 bg-white">
+                <option value="">{{ isLoadingSizes ? 'Loading sizes…' : 'Select a size' }}</option>
+                <option v-if="form.size && !sizeOptions.some(size => formatFinishedArtefactSize(size) === form.size)" :value="form.size">{{ form.size }} (existing size)</option>
+                <option v-for="size in sizeOptions" :key="size.id" :value="formatFinishedArtefactSize(size)">{{ formatFinishedArtefactSize(size) }}</option>
+              </select>
+              <p v-if="sizeLoadError" role="alert" class="text-xs text-red-700">Unable to load sizes. <button type="button" class="font-semibold underline" @click="loadSizeOptions">Try again</button></p>
+              <p v-else-if="!isLoadingSizes && !sizeOptions.length" class="text-xs text-gray-500">No finished sizes available. Add one in setups.</p>
             </div>
             <div class="flex flex-col gap-1">
               <label class="text-sm font-semibold text-gray-700">Pages</label>
@@ -366,6 +372,9 @@ import { useRoute, useRouter, useNuxtApp } from '#app';
 import { emptyFinishingPrices, finishingPricesFromApi, bookworkQuantities, foldingPrice, toFinishingPricesPayload, LAMINATION_TYPES, LAMINATION_SIZES, SPOT_TYPES } from '~/utils/finishingPricing';
 import { getProductionRequestDetails } from '~/services/productionRequests';
 import { getRawMaterials } from '~/services/rawMaterials';
+import { getFinishedArtefactSizes } from '~/services/finishedArtefactSizes';
+import { fetchAllFinishedArtefactSizes, formatFinishedArtefactSize } from '~/utils/finishedArtefactSizeOptions';
+import type { FinishedArtefactSize } from '~/models';
 import { createProductionEstimate, updateProductionEstimate, getEstimateDetails } from '~/services/estimates';
 
 const { $toast } = useNuxtApp();
@@ -379,6 +388,21 @@ const prodRequestId = ref('');
 const estimateId = ref('');        // populated when editing an existing estimate
 const productionRequest = ref<any>(null);
 const inventoryItems = ref<any[]>([]);
+const sizeOptions = ref<FinishedArtefactSize[]>([]);
+const isLoadingSizes = ref(true);
+const sizeLoadError = ref(false);
+const loadSizeOptions = async () => {
+  isLoadingSizes.value = true;
+  sizeLoadError.value = false;
+  try {
+    sizeOptions.value = await fetchAllFinishedArtefactSizes(getFinishedArtefactSizes);
+  } catch (error) {
+    console.error('Unable to load finished artefact sizes:', error);
+    sizeLoadError.value = true;
+  } finally {
+    isLoadingSizes.value = false;
+  }
+};
 
 const getTodayFormatted = () => {
   const today = new Date();
@@ -1173,6 +1197,7 @@ const loadEstimateForEdit = async (id: string) => {
 
 // ── Initialization ────────────────────────────────────────────────────────────
 onMounted(async () => {
+  void loadSizeOptions();
   onTemplateChange();
   await refreshFinishingPrices();
 
