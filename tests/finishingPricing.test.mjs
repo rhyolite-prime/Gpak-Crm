@@ -96,7 +96,7 @@ test('folding band uses job quantity, not collated pieces or folding batches', (
   const jobQuantity = 200
   const quantities = bookworkQuantities(8, jobQuantity, 64, 0, 0, 0, 0, 0)
   assert.equal(quantities.collate, 1600)
-  assert.equal(quantities.folding, 2)
+  assert.equal(quantities.folding, 8)
   assert.equal(foldingPrice(jobQuantity, prices), 20)
   assert.equal(foldingPrice(1000, prices), 20)
   assert.equal(foldingPrice(1001, prices), 15)
@@ -156,4 +156,16 @@ test('custom lamination widths round trip without restoring deleted defaults', a
   rows.gloss.pop()
   rows.gloss.push({ size: 500, price: -1 })
   assert.throws(() => laminationFromRows(rows), /non-negative/)
+})
+
+
+test('folding quantity uses a minimum job quantity of 1000 without changing other quantities', () => {
+  const calculate = quantity => bookworkQuantities(8, quantity, 64, 0, 0, 0, 0, 0)
+  assert.equal(calculate(200).folding, 8)
+  assert.equal(calculate(1000).folding, 8)
+  assert.equal(calculate(1001).folding, 9)
+  assert.equal(calculate(2500).folding, 20)
+  assert.equal(calculate(200).collate, 1600)
+  assert.equal(calculate(200).perfectBind, 12800)
+  assert.equal(bookworkQuantities(2.5, 200, 0, 0, 0, 0, 0, 0).folding, 3)
 })

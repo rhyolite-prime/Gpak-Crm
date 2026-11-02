@@ -33,3 +33,5 @@ Backend changes to make or verify:
 On the new estimate, each lamination row lists widths configured for its own type. A selected width supplies the unit price and feeds the existing quantity formula. Saved estimate snapshots retain their own configuration; a previously selected width that is no longer configured is shown as unavailable rather than silently changed.
 
 Folding bands remain inclusive, non-overlapping and may contain gaps. A null maximum is unbounded. The job quantity selects one band and its price is charged once as a flat amount. Legacy folding fields are read for migration but excluded from outgoing setup payloads.
+
+Folding quantity is `ceil(pages in a section × max(job quantity, 1000) / 1000)`. The minimum quantity applies only to this calculation; price-band selection and other quantities use the actual job quantity.
