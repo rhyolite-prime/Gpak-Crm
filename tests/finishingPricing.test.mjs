@@ -108,19 +108,27 @@ test('new estimate selects the folding band using form job quantity', async () =
   assert.match(page, /folding:\s*\[qty\.folding,\s*foldingPrice\(Number\(form\.quantity\)\s*\|\|\s*0,\s*prices\)\]/)
 })
 
-test('lamination uses printing cover, selected width and cover paper overs', async () => {
-  const { laminationQuantity, laminationUnitPrice, coverMaterialOvers } = await import('../utils/finishingPricing.ts')
+test('lamination uses cover paper quantity, selected width and cover paper overs', async () => {
+  const { laminationQuantity, laminationUnitPrice, coverMaterialOvers, coverMaterialInputs } = await import('../utils/finishingPricing.ts')
   const rows = [
     { id: 'inside', category: 'Paper info', quantity: 100 },
     { id: 'cover', category: 'Paper info', quantity: 80 },
     { id: 'inside-overs', category: 'Paper info', isPercentagePlugin: true, percentageTarget: 'inside', quantity: 10 },
     { id: 'cover-overs', category: 'Paper info', isPercentagePlugin: true, percentageTarget: 'cover', quantity: 8 },
     { id: 'extra-cover-overs', category: 'Paper info', isPercentagePlugin: true, percentageTarget: 'cover', quantity: 2 },
+    { id: 'printing-cover', category: 'Printing', quantity: 20 },
   ]
   assert.equal(coverMaterialOvers(rows, 'bookwork'), 10)
   assert.equal(coverMaterialOvers(rows, 'labels'), 10)
   assert.equal(coverMaterialOvers([], 'bookwork'), 0)
-  assert.equal(laminationQuantity(20, coverMaterialOvers(rows, 'bookwork'), 2, 510), 30.6)
+  assert.deepEqual(coverMaterialInputs(rows, 'bookwork'), { quantity: 80, overs: 10 })
+  assert.deepEqual(coverMaterialInputs(rows, 'labels'), { quantity: 100, overs: 10 })
+  assert.deepEqual(coverMaterialInputs([], 'bookwork'), { quantity: 0, overs: 0 })
+  const cover = coverMaterialInputs(rows, 'bookwork')
+  assert.equal(laminationQuantity(cover.quantity, cover.overs, 2, 510), 91.8)
+  assert.equal(bookworkQuantities(4, 200, 32, cover.quantity, cover.overs, 2, 510, 0).lamination, 91.8)
+  rows.find(row => row.id === 'cover-overs').quantity = 15
+  assert.equal(coverMaterialInputs(rows, 'bookwork').overs, 17)
   const prices = defaultFinishingPrices()
   prices.lamination.matt['510'] = 2.5
   prices.lamination.gloss['510'] = 0
@@ -168,4 +176,12 @@ test('folding quantity uses a minimum job quantity of 1000 without changing othe
   assert.equal(calculate(200).collate, 1600)
   assert.equal(calculate(200).perfectBind, 12800)
   assert.equal(bookworkQuantities(2.5, 200, 0, 0, 0, 0, 0, 0).folding, 3)
+})
+
+
+test('estimate uses cover material inputs for both automated and selected lamination rows', async () => {
+  const { readFile } = await import('node:fs/promises')
+  const page = await readFile(new URL('../pages/estimates/new.vue', import.meta.url), 'utf8')
+  assert.match(page, /bookworkQuantities\([^;]*cover\.quantity, cover\.overs,/)
+  assert.match(page, /laminationQuantity\(cover\.quantity, cover\.overs,/)
 })

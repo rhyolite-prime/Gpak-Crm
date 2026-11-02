@@ -395,7 +395,7 @@
 <script setup lang="ts">
 import { useRoute, useRouter, useNuxtApp } from '#app';
 import { finishingOptionGroups, findFinishingOption, findLaminationOption, laminationDescription } from '~/utils/productionFinishingOptions';
-import { emptyFinishingPrices, finishingPricesFromApi, bookworkQuantities, foldingPrice, laminationQuantity, laminationUnitPrice, coverMaterialOvers, toFinishingPricesPayload, laminationSizes, LAMINATION_TYPES, SPOT_TYPES } from '~/utils/finishingPricing';
+import { emptyFinishingPrices, finishingPricesFromApi, bookworkQuantities, foldingPrice, laminationQuantity, laminationUnitPrice, coverMaterialInputs, toFinishingPricesPayload, laminationSizes, LAMINATION_TYPES, SPOT_TYPES } from '~/utils/finishingPricing';
 import { getProductionRequestDetails } from '~/services/productionRequests';
 import { getRawMaterials } from '~/services/rawMaterials';
 import { getFinishedArtefactSizes } from '~/services/finishedArtefactSizes';
@@ -716,10 +716,9 @@ const updateBookworkFinishing = () => {
     if (!row) { row = { id: generateId(), category: 'Finishing', finishingKind: kind, description, quantity: 0, unitPrice: null }; form.tableRows.push(row); }
     if (row.description !== description) row.description = description;
   }
-  const coverOvers = coverMaterialOvers(form.tableRows, form.templateType);
-  const printingCover = form.tableRows.find(r => r.category === 'Printing' && r.description.toLowerCase().includes('printing cover'));
+  const cover = coverMaterialInputs(form.tableRows, form.templateType);
   const pagesInSection = form.pagesToView && form.pagesOut ? (Number(form.pages) || 0) / (Number(form.pagesToView) * Number(form.pagesOut)) : 0;
-  const qty = bookworkQuantities(pagesInSection, Number(form.quantity) || 0, Number(form.pages) || 0, Number(printingCover?.quantity) || 0, coverOvers, Number(form.noOfCoversPerSheet) || 0, Number(finishingSelection.laminateSize) || 0, Math.max(0, Number(finishingSelection.spotOvers) || 0));
+  const qty = bookworkQuantities(pagesInSection, Number(form.quantity) || 0, Number(form.pages) || 0, cover.quantity, cover.overs, Number(form.noOfCoversPerSheet) || 0, Number(finishingSelection.laminateSize) || 0, Math.max(0, Number(finishingSelection.spotOvers) || 0));
   const prices = finishingPrices.value;
   const bindingPrice = finishingSelection.binding === 'perfect-bind' ? prices.perfectBind : finishingSelection.binding === 'saddle-stitch' ? prices.saddleStitch : prices.caseBind;
   const values: Record<string, [number, number | null]> = {
@@ -751,13 +750,12 @@ watch(() => ({
     option: row.finishingOptionValue, size: row.laminateSize, isFinishingOption: row.isFinishingOption,
   })),
 }), () => {
-  const printingCover = form.tableRows.find(row => row.category === 'Printing' && row.description.toLowerCase().includes('printing cover'));
-  const overs = coverMaterialOvers(form.tableRows, form.templateType);
+  const cover = coverMaterialInputs(form.tableRows, form.templateType);
   for (const row of form.tableRows) {
     if (!row.isFinishingOption || !row.laminateSize) continue;
     const option = findLaminationOption(row.finishingOptionValue, row.description);
     if (!option) continue;
-    row.quantity = laminationQuantity(Number(printingCover?.quantity) || 0, overs, Number(form.noOfCoversPerSheet) || 0, Number(row.laminateSize) || 0);
+    row.quantity = laminationQuantity(cover.quantity, cover.overs, Number(form.noOfCoversPerSheet) || 0, Number(row.laminateSize) || 0);
     row.unitPrice = laminationUnitPrice(finishingPrices.value, option.value.slice('lamination:'.length), row.laminateSize);
   }
 }, { deep: true });
