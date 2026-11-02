@@ -332,10 +332,6 @@
       <section class="flex justify-end mt-8 border-t border-gray-200 pt-8">
         <div class="w-full max-w-md bg-gray-50 p-6 rounded-lg border border-gray-200 shadow-sm">
           <div class="space-y-3">
-            <div class="flex justify-between text-sm text-gray-600">
-              <span>Direct Labour</span>
-              <input v-model.number="form.directLabour" type="number" step="0.01" class="w-24 border border-gray-300 rounded p-1 text-right text-sm focus:ring-red-500 focus:border-red-500" />
-            </div>
             <div class="flex justify-between text-sm text-gray-600 font-medium border-b border-gray-200 pb-2">
               <span>Total Value (Sub Total)</span>
               <span>{{ formatCurrency(subTotal) }}</span>
@@ -500,7 +496,6 @@ const form = reactive({
   wasteFactor: 0.1 as number,
   summaries: [] as SummaryField[],
   tableRows: [] as TableRow[],
-  directLabour: 0.05,
   marginPercentage: 35.00,
   taxPercentage: 20.0,
 });
@@ -946,7 +941,7 @@ const subTotal = computed(() => {
     if (row.isPercentagePlugin) return sum + (row.computedTotal || 0);
     return sum + lineTotal(row);
   }, 0);
-  return itemsTotal + (form.directLabour || 0);
+  return itemsTotal;
 });
 
 const marginAmount = computed(() => subTotal.value * ((form.marginPercentage || 0) / 100));
@@ -1004,16 +999,13 @@ const saveEstimate = async () => {
 
   try {
     // ── Computed totals ───────────────────────────────────────────────────────
-    const subTotal = form.tableRows.reduce((sum, r) => {
-      if (r.isPercentagePlugin) return sum + (r.computedTotal || 0);
-      return sum + lineTotal(r);
-    }, 0);
-    const unitCostOfProduction = form.quantity ? subTotal / form.quantity : 0;
-    const marginAmount = subTotal * (form.marginPercentage / 100);
-    const totalExclVat = subTotal + marginAmount;
-    const nhisGetFundAmount = totalExclVat * (form.directLabour || 0);
-    const vatAmount = (totalExclVat + nhisGetFundAmount) * (form.taxPercentage / 100);
-    const grandTotal = totalExclVat + nhisGetFundAmount + vatAmount;
+    // Use the same reactive totals shown on the form when saving.
+    const savedSubTotal = subTotal.value;
+    const unitCostOfProduction = form.quantity ? savedSubTotal / form.quantity : 0;
+    const savedMarginAmount = marginAmount.value;
+    const savedTotalExclVat = totalExclVat.value;
+    const vatAmount = taxAmount.value;
+    const savedGrandTotal = grandTotal.value;
 
     // ── Encode all new.vue-specific header fields as variables ─────────────
     // These are stored with the estimate so the edit page can fully reconstruct
@@ -1029,7 +1021,6 @@ const saveEstimate = async () => {
       makeVar('No. of Inside Plates','noOfInsidePlates',  String(form.noOfInsidePlates ?? '')),
       makeVar('No. of Cover Plates',   'noOfCoverPlates',       String(form.noOfCoverPlates ?? '')),
       makeVar('Waste Factor',           'wasteFactor',           String(form.wasteFactor ?? 0.1)),
-      makeVar('Direct Labour',          'directLabour',          String(form.directLabour ?? 0.05)),
       makeVar('Margin %',               'marginPercentage',      String(form.marginPercentage ?? 35)),
       makeVar('Tax %',                  'taxPercentage',         String(form.taxPercentage ?? 20)),
       // Summary fields (JSON-encoded so the edit page can restore them)
@@ -1076,15 +1067,15 @@ const saveEstimate = async () => {
 
       // Computed summary (for immediate display on retrieval)
       summary: {
-        subTotal,
+        subTotal: savedSubTotal,
         unitCostOfProduction,
-        marginAmount,
-        totalExclVat,
-        nhisGetFundAmount,
+        marginAmount: savedMarginAmount,
+        totalExclVat: savedTotalExclVat,
+        nhisGetFundAmount: 0,
         vatAmount,
-        grandTotal,
+        grandTotal: savedGrandTotal,
         taxRates: {
-          nhisGetFund: (form.directLabour || 0) * 100,
+          nhisGetFund: 0,
           vat:         form.taxPercentage,
         },
       },
@@ -1097,10 +1088,9 @@ const saveEstimate = async () => {
 
       // Linking
       productionRequestId:     prodRequestId.value || undefined,
-      estimatedCost:           grandTotal,
+      estimatedCost:           savedGrandTotal,
       description:             `${form.jobName || 'Estimate'} (Qty: ${form.quantity}, Size: ${form.size})`,
       taxes: [
-        { taxName: 'Direct Labour', rate: (form.directLabour || 0) * 100, isPercentage: true, taxAmount: nhisGetFundAmount },
         { taxName: 'VAT',           rate: form.taxPercentage,              isPercentage: true, taxAmount: vatAmount },
       ],
     };
@@ -1167,7 +1157,6 @@ const loadEstimateForEdit = async (id: string) => {
     form.noOfInsidePlates= toNum(getVar(vars, 'noOfInsidePlates'));
     form.noOfCoverPlates    = toNum(getVar(vars, 'noOfCoverPlates'));
     form.wasteFactor        = Number(getVar(vars, 'wasteFactor') ?? 0.1);
-    form.directLabour       = Number(getVar(vars, 'directLabour') ?? 0.05);
     form.taxPercentage      = Number(getVar(vars, 'taxPercentage') ?? 20);
 
     // Restore summary fields if present
