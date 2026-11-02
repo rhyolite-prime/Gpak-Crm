@@ -59,3 +59,15 @@ export function findFinishingOption(value: string) {
   }
   return null
 }
+
+// Older estimate snapshots only have the original option description.
+export function findLaminationOption(value: string | undefined, description: string) {
+  const option = value ? findFinishingOption(value) : null
+  if (option?.value.startsWith('lamination:')) return option
+  const legacy = laminateOptions.find(item => description === `Lamination: ${item.name}` || description.startsWith(`Lamination: ${item.name} (`))
+  return legacy ? findFinishingOption(`lamination:${legacy.id}`) : null
+}
+
+export function laminationDescription(name: string, size: string) {
+  return `Lamination: ${name}${size ? ` (${size} mm)` : ''}`
+}

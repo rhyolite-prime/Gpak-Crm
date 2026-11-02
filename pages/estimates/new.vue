@@ -276,6 +276,13 @@
                   <tr v-for="row in getRowsByCategory(category)" :key="row.id" class="hover:bg-gray-50">
                     <td class="px-4 py-2">
                       <input v-model="row.description" :readonly="!!row.finishingKind || !!row.isFinishingOption" type="text" class="w-full border-transparent bg-transparent rounded p-1 focus:border-red-500 focus:ring-red-500 text-sm" placeholder="Item description" />
+                      <label v-if="row.isFinishingOption && findLaminationOption(row.finishingOptionValue, row.description)" class="mt-1 flex items-center gap-2 text-xs text-gray-600">
+                        Size
+                        <select :value="row.laminateSize || ''" @change="onLaminationSizeChange(row, ($event.target as HTMLSelectElement).value)" aria-label="Lamination size" class="border border-gray-200 rounded px-2 py-1 text-xs text-gray-600 bg-gray-50 focus:ring-red-400 focus:border-red-400">
+                          <option value="">— Size —</option>
+                          <option v-for="size in LAMINATION_SIZES" :key="size" :value="size">{{ size }} mm</option>
+                        </select>
+                      </label>
                       <label v-if="row.finishingKind === 'spot'" class="mt-1 flex items-center gap-2 text-xs text-gray-600">Job overs <input v-model.number="finishingSelection.spotOvers" type="number" min="0" step="1" aria-label="Spot finish job overs" class="w-24 border border-gray-300 px-2 py-1" /></label>
                     </td>
                     <td class="px-4 py-2">
@@ -379,7 +386,7 @@
 
 <script setup lang="ts">
 import { useRoute, useRouter, useNuxtApp } from '#app';
-import { finishingOptionGroups, findFinishingOption } from '~/utils/productionFinishingOptions';
+import { finishingOptionGroups, findFinishingOption, findLaminationOption, laminationDescription } from '~/utils/productionFinishingOptions';
 import { emptyFinishingPrices, finishingPricesFromApi, bookworkQuantities, foldingPrice, toFinishingPricesPayload, LAMINATION_TYPES, LAMINATION_SIZES, SPOT_TYPES } from '~/utils/finishingPricing';
 import { getProductionRequestDetails } from '~/services/productionRequests';
 import { getRawMaterials } from '~/services/rawMaterials';
@@ -443,6 +450,8 @@ interface TableRow {
   quantityManuallyEdited?: boolean;
   finishingKind?: string;
   isFinishingOption?: boolean;
+  finishingOptionValue?: string;
+  laminateSize?: string;
 }
 
 interface SummaryField {
@@ -958,9 +967,16 @@ const selectedFinishingOption = ref('');
 const addFinishingOption = () => {
   const option = findFinishingOption(selectedFinishingOption.value);
   if (!option) return;
-  form.tableRows.push({ id: generateId(), category: 'Finishing', description: `${option.group}: ${option.name}`, quantity: null, unitPrice: null, isFinishingOption: true });
+  form.tableRows.push({ id: generateId(), category: 'Finishing', description: `${option.group}: ${option.name}`, quantity: null, unitPrice: null, isFinishingOption: true, finishingOptionValue: option.value, laminateSize: '' });
   selectedFinishingOption.value = '';
   showFinishingPicker.value = false;
+};
+const onLaminationSizeChange = (row: TableRow, size: string) => {
+  const option = findLaminationOption(row.finishingOptionValue, row.description);
+  if (!option) return;
+  row.finishingOptionValue = option.value;
+  row.laminateSize = size;
+  row.description = laminationDescription(option.name, size);
 };
 const addTableRow = (category: string) => {
   const newRow: TableRow = { id: generateId(), description: '', quantity: null, unitPrice: null, category };

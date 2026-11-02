@@ -13,3 +13,16 @@ test('estimate options are grouped from the production request options', () => {
   assert.equal(findFinishingOption('varnish:waterbase-varnish').name, 'Waterbase varnish')
   assert.equal(findFinishingOption('missing:gloss'), null)
 })
+
+test('lamination selections retain their identity and display the selected size', async () => {
+  const { findLaminationOption, laminationDescription } = await import('../utils/productionFinishingOptions.ts')
+  for (const option of laminateOptions) {
+    const description = laminationDescription(option.name, '510')
+    assert.equal(description, `Lamination: ${option.name} (510 mm)`)
+    assert.equal(findLaminationOption(`lamination:${option.id}`, description).name, option.name)
+    assert.equal(findLaminationOption(undefined, `Lamination: ${option.name}`).name, option.name)
+    assert.equal(findLaminationOption(undefined, description).name, option.name)
+    assert.equal(laminationDescription(option.name, ''), `Lamination: ${option.name}`)
+  }
+  assert.equal(findLaminationOption('binding:wire-o', 'Binding: Wire O'), null)
+})
