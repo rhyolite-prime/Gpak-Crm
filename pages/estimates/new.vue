@@ -717,6 +717,7 @@ const updateBookworkFinishing = () => {
     if (row.description !== description) row.description = description;
   }
   const coverOvers = coverMaterialOvers(form.tableRows, form.templateType);
+  console.log('coverOvers->', coverOvers);
   const printingCover = form.tableRows.find(r => r.category === 'Printing' && r.description.toLowerCase().includes('printing cover'));
   const pagesInSection = form.pagesToView && form.pagesOut ? (Number(form.pages) || 0) / (Number(form.pagesToView) * Number(form.pagesOut)) : 0;
   const qty = bookworkQuantities(pagesInSection, Number(form.quantity) || 0, Number(form.pages) || 0, Number(printingCover?.quantity) || 0, coverOvers, Number(form.noOfCoversPerSheet) || 0, Number(finishingSelection.laminateSize) || 0, Math.max(0, Number(finishingSelection.spotOvers) || 0));
@@ -752,7 +753,9 @@ watch(() => ({
   })),
 }), () => {
   const printingCover = form.tableRows.find(row => row.category === 'Printing' && row.description.toLowerCase().includes('printing cover'));
+  console.log('printingCover->', printingCover);
   const overs = coverMaterialOvers(form.tableRows, form.templateType);
+  console.log('overs->', overs);
   for (const row of form.tableRows) {
     if (!row.isFinishingOption || !row.laminateSize) continue;
     const option = findLaminationOption(row.finishingOptionValue, row.description);
