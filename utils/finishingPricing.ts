@@ -76,16 +76,27 @@ export function laminationSizes(prices: FinishingPrices, type: string): string[]
   return Object.keys(prices.lamination?.[type] ?? {}).filter(size => Number.isFinite(Number(size)) && Number(size) > 0).sort((a, b) => Number(a) - Number(b))
 }
 
-/** Lamination is measured in metres using the printing cover quantity and cover paper overs. */
+/** Lamination is measured in metres using the cover paper quantity and cover paper overs. */
 export function laminationQuantity(coverQuantity: number, coverOvers: number, outs: number, size: number): number {
   return (coverQuantity + coverOvers) * outs * size / 1000
 }
 
-export function coverMaterialOvers(rows: { id: string; category: string; isPercentagePlugin?: boolean; percentageTarget?: string; quantity?: number | null }[], templateType: string): number {
+type CoverMaterialRow = { id: string; category: string; isPercentagePlugin?: boolean; percentageTarget?: string; quantity?: number | null }
+
+/** The bookwork template has inside then cover paper; other templates have one cover paper row. */
+export function coverMaterialInputs(rows: CoverMaterialRow[], templateType: string): { quantity: number; overs: number } {
   const paperRows = rows.filter(row => row.category === 'Paper info' && !row.isPercentagePlugin)
   const cover = paperRows[templateType === 'bookwork' ? 1 : 0]
-  return cover ? rows.filter(row => row.isPercentagePlugin && row.percentageTarget === cover.id)
-    .reduce((sum, row) => sum + (Number(row.quantity) || 0), 0) : 0
+  if (!cover) return { quantity: 0, overs: 0 }
+  return {
+    quantity: Number(cover.quantity) || 0,
+    overs: rows.filter(row => row.isPercentagePlugin && row.percentageTarget === cover.id)
+      .reduce((sum, row) => sum + (Number(row.quantity) || 0), 0),
+  }
+}
+
+export function coverMaterialOvers(rows: CoverMaterialRow[], templateType: string): number {
+  return coverMaterialInputs(rows, templateType).overs
 }
 
 export function laminationUnitPrice(prices: FinishingPrices, type: string, size: string): number | null {
