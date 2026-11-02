@@ -63,6 +63,16 @@ export interface FinishingPrice extends BaseEntityModel {
 
 }
 
+export interface FinishedArtefactSize extends BaseEntityModel { 
+
+    length: number; 
+    width: number; 
+    unit: string; 
+
+}
+
+
+
 export interface ProductionOrder extends BaseEntityModel {
 
   quotationId: string;  
