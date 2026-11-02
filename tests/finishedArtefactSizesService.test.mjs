@@ -4,10 +4,10 @@ import { getFinishedArtefactSizes, createFinishedArtefactSize, updateFinishedArt
 
 test('finished size service uses dimensions and safely passes IDs', async () => {
   const calls = []
-  const result = { data: [{ id: 'size/1', length: 210, width: 148, unit: 'mm' }], totalCount: 1, totalPages: 1 }
+  const result = { data: [{ id: 'size/1', alias: 'A5', length: 210, width: 148, unit: 'mm' }], totalCount: 1, totalPages: 1 }
   globalThis.httpClient = async (path, options) => { calls.push({ path, options }); return { success: true, result } }
   try {
-    const payload = { length: 210, width: 148, unit: 'mm' }
+    const payload = { alias: 'A5', length: 210, width: 148, unit: 'mm' }
     assert.deepEqual(await getFinishedArtefactSizes({ query: '', pageNo: 1, pageSize: 10 }), result)
     assert.equal(await createFinishedArtefactSize(payload), true)
     assert.equal(await updateFinishedArtefactSize({ ...payload, id: 'size/1' }), true)
