@@ -3,6 +3,7 @@ import type { FinishedArtefactSize , BaseApiResponse, BasePaginationModel,} from
 export async function getFinishedArtefactSizes(query: object) {
  
   const response = await httpClient<BaseApiResponse<BasePaginationModel<FinishedArtefactSize[]>>>('FinishedArtefactSize/getall', { query });
+  if (response.success === false) throw new Error(response.error?.message || 'Unable to load finished artefact sizes.')
   return response.result;
 }
 
@@ -23,8 +24,9 @@ export async function updateFinishedArtefactSize(payload: object) {
 }
 
 export async function deleteFinishedArtefactSize(id: string) {
-  const response = await httpClient<BaseApiResponse<object>>(`FinishedArtefactSize/delete?id=${id}`, {
+  const response = await httpClient<BaseApiResponse<object>>('FinishedArtefactSize/delete', {
     method: "delete",
+    query: { id },
   });
   return response.success;
 }

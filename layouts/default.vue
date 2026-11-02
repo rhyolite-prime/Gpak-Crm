@@ -90,6 +90,7 @@ const navigation = [
       { name: 'Workflows', href: '/setups/workflows', icon: GitBranch },
       { name: 'Finishing Options', href: '/setups/finishing-options', icon: ClipboardCheck },
       { name: 'Finishing Prices', href: '/setups/finishing-prices', icon: DollarSign },
+      { name: 'Finished Artefact Sizes', href: '/setups/finished-artefact-sizes', icon: LayoutGrid },
       { name: 'Formula Builder', href: '/setups/formula-builder', icon: Activity },
       { name: 'Estimate Types', href: '/setups/estimates-types', icon: Tags },
       { name: 'QC Checklist', href: '/setups/qc-checklist', icon: ClipboardCheck },
